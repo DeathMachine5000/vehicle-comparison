@@ -457,23 +457,23 @@ const V = {
     knownIssues: ["iDrive 9 latency & screen glitches","Steering software recall","Rear brake hose leak recall","56% chance major repair in 5yr","Premium parts = premium labor"],
     dogCargo: "26.6 cu ft (seats up)", dogNotes: "Tight cargo for dogs. Leather cleans easy but scratches. Low ride height good for older dogs.", dogScore: 6
   },
-  toyLtd: {
-    name: "4Runner Limited", trim: "Limited 4WD", year: 2026, modelYearNote: "Latest MY",
-    msrp: 51020, color: "#cc0000", badgeText: "Best Value", badgeClass: "best",
-    fuelType: "regular", mpgCity: 20, mpgHwy: 24, mpgCombined: 21,
-    engine: "2.4L Turbo I4 i-FORCE", hp: 278, torque: 317, zeroToSixty: 8.0,
-    transmission: "8-spd auto", drivetrain: "4WD",
+  toyORP: {
+    name: "4Runner TRD ORP", trim: "TRD Off-Road Premium 4WD", year: 2026, modelYearNote: "Koons Annapolis",
+    msrp: 58570, color: "#cc0000", badgeText: "GF's Pick", badgeClass: "best",
+    fuelType: "regular", mpgCity: 19, mpgHwy: 25, mpgCombined: 21,
+    engine: "2.4L Turbo I4 i-FORCE", hp: 278, torque: 317, zeroToSixty: 7.5,
+    transmission: "8-spd auto", drivetrain: "4WD + E-Locking Rear Diff",
     oilChangeInterval: 10000, oilChangeCost: 75,
-    tireCostSet: 780, tireLifeMiles: 40000,
+    tireCostSet: 850, tireLifeMiles: 40000,
     brakeCost: 550, brakeLifeMiles: 55000,
     transServiceCost: 170, transServiceMiles: 120000,
     majorServiceCosts: [0,0,300,0,0,550,0,0,300,0],
-    annualInsurance: 1800,
-    depRate5yr: 0.30, depRate10yr: 0.56,
+    annualInsurance: 1950,
+    depRate5yr: 0.28, depRate10yr: 0.54,
     warrantyBasic: "3yr/36k", warrantyPT: "5yr/60k", warrantyFree: "2yr/25k ToyotaCare",
     reliabilityScore: 4.0, repairProb5yr: 0.18, repairsPerYear: 0.3, avgRepairCost: 514,
-    knownIssues: ["New turbo engine (1st gen — monitor)","Some transmission shift-hunting","Electrical memory setting glitches","No recalls as of Feb 2026","Consumer Reports: above-avg predicted"],
-    dogCargo: "47.2 cu ft (seats up) / 90.2 folded", dogNotes: "Excellent cargo. Durable interior resists fur. Power rear window — classic 4Runner dog feature. Higher clearance may need ramp for older dogs.", dogScore: 9
+    knownIssues: ["New turbo engine (1st gen — monitor)","Some transmission shift-hunting","E-locking diff is proven tech","No recalls as of Feb 2026","Consumer Reports: above-avg predicted"],
+    dogCargo: "48.4 cu ft (seats up) / 90.2 folded", dogNotes: "Excellent cargo. SofTex seats resist fur and clean easy. Power rear window. Heated+ventilated front seats. E-locking diff for off-road with the dog. Great trail capability.", dogScore: 9
   },
   toyTRD: {
     name: "4Runner TRD Pro", trim: "TRD Pro i-FORCE MAX", year: 2026, modelYearNote: "Latest MY",
@@ -812,12 +812,12 @@ function renderComfort() {
       laneKeep: 'Standard', rearCross: 'Standard', autoHighBeam: 'Standard',
       rideQuality: 8, cabinNoise: 9, techScore: 9, luxuryScore: 8
     },
-    toyLtd: {
-      heatedSeats: 'Standard (front)', cooledSeats: 'Standard (front)', heatedWheel: 'Standard',
-      panoroof: 'Moonroof', headsUp: 'Standard (10")', wireless: 'Wireless AA+CP',
+    toyORP: {
+      heatedSeats: 'Standard (front, SofTex)', cooledSeats: 'Standard (ventilated)', heatedWheel: 'Standard',
+      panoroof: 'No (power moonroof N/A)', headsUp: 'Standard (10")', wireless: 'Wireless AA+CP',
       sound: 'JBL 14-spkr', screenSize: '14" touchscreen', remoteStart: 'Remote Connect App',
-      keyless: 'Smart Key', memorySeats: '2-person memory', powerLift: 'Power w/ kick sensor',
-      ambientLight: 'Yes', ventilation: 'Front only', massage: 'No', rearUSB: '2x USB-C',
+      keyless: 'Smart Key', memorySeats: 'Driver memory', powerLift: 'Power w/ kick sensor',
+      ambientLight: 'Yes', ventilation: 'Standard (front)', massage: 'No', rearUSB: '2x USB-C',
       adaptCruise: 'Standard w/ stop-go', parkAssist: 'Multi-terrain monitor', blindSpot: 'Standard',
       laneKeep: 'Standard', rearCross: 'Standard', autoHighBeam: 'Standard',
       rideQuality: 7, cabinNoise: 7, techScore: 8, luxuryScore: 7
@@ -923,9 +923,9 @@ function renderComfort() {
         <p>Mark Levinson 21-speaker audio, 64-color ambient lighting, heated+cooled front seats, heated rear seats, panoramic moonroof, and the quietest cabin short of the BMW. If you want to feel pampered on the Annapolis commute, this is it.</p>
       </div>
       <div class="gf-pick">
-        <div class="crown">Best Tech for the Price</div>
-        <h5>4Runner Limited</h5>
-        <p>JBL 14-speaker audio, 14" touchscreen, heads-up display, wireless CarPlay/AA, heated+cooled seats, and a moonroof — all for $51K. You get 85% of the Lexus tech experience at 60% of the price. The best bang-for-buck comfort package here.</p>
+        <div class="crown">GF's Pick — Best Value + Capability</div>
+        <h5>4Runner TRD Off-Road Premium</h5>
+        <p>Heated+ventilated SofTex seats, JBL 14-speaker audio, 14" touchscreen, heads-up display, wireless CarPlay/AA, e-locking rear diff, and Multi-Terrain Monitor — all for $58.5K. Trail-ready with everyday comfort. The Koons Annapolis unit is waiting for you.</p>
       </div>
       <div class="gf-pick">
         <div class="crown">Best for Road Trips</div>
@@ -979,8 +979,8 @@ function renderVerdict() {
       <div class="savings">${fmt(savingsVsBmw)} saved vs keeping the BMW over ${yrs} years</div>
       <p>At your 17K miles/year pace in Annapolis, the <strong>${V[best].name}</strong> comes out on top at ${fmtD(calc[best].cpm)}/mile — the lowest net cost of all six vehicles by a significant margin.</p>
       <p>The <strong>4Runner TRD Pro</strong> is worth a serious look too: its hybrid powertrain gets 23 MPG combined on regular gas, the FOX suspension and stabilizer disconnect make it genuinely trail-ready, and its predicted depreciation (50% at 10yr) is the best of any vehicle here. You pay more upfront but it holds value like a tank.</p>
-      <p>The <strong>Lexus GX 550</strong> trims are beautiful trucks, but every one of them costs more to own than your current BMW — premium fuel at 15-17 MPG combined, $3,250+/yr insurance, $180 oil changes, and that engine recall is a dealbreaker until Lexus fully resolves it. The Overtrail's flat cargo floor is amazing for dogs, but you're paying $48K+ more over 10 years for it vs the 4Runner Limited.</p>
-      <p>For a dog-friendly, reliable, 10-year-plus vehicle that still has some plushness: the <strong>4Runner Limited</strong> is the wallet-smart pick, and the <strong>TRD Pro</strong> is the "treat yourself responsibly" pick.</p>
+      <p>The <strong>Lexus GX 550</strong> trims are beautiful trucks, but every one of them costs more to own than your current BMW — premium fuel at 15-17 MPG combined, $3,250+/yr insurance, $180 oil changes, and that engine recall is a dealbreaker until Lexus fully resolves it. The Overtrail's flat cargo floor is amazing for dogs, but you're paying significantly more over 10 years for it vs the 4Runner trims.</p>
+      <p>For a dog-friendly, reliable, 10-year-plus vehicle: the <strong>4Runner TRD Off-Road Premium</strong> at Koons Annapolis is the smart pick with trail capability + daily comfort, and the <strong>TRD Pro</strong> is the "treat yourself responsibly" hybrid pick.</p>
     </div>
     <div class="chart-box" style="margin-top:24px"><h4>Full Comparison Recap</h4>
       <table class="data-table"><thead><tr><th>Category</th>${KEYS.map(k=>`<th>${V[k].name}</th>`).join('')}</tr></thead>
@@ -998,9 +998,9 @@ function showTab(id, el) {
 // ============================
 // DEAL CALCULATOR
 // ============================
-const DEAL_VEHICLES = ['toyLtd','toyTRD','lexPrem','lexOT','lexOTP'];
-const INVOICE_EST = { toyLtd: 46930, toyTRD: 63800, lexPrem: 62200, lexOT: 72600, lexOTP: 73900 };
-const MILITARY_DISC = { toyLtd: 500, toyTRD: 500, lexPrem: 1000, lexOT: 1000, lexOTP: 1000 };
+const DEAL_VEHICLES = ['toyORP','toyTRD','lexPrem','lexOT','lexOTP'];
+const INVOICE_EST = { toyORP: 53500, toyTRD: 63800, lexPrem: 62200, lexOT: 72600, lexOTP: 73900 };
+const MILITARY_DISC = { toyORP: 500, toyTRD: 500, lexPrem: 1000, lexOT: 1000, lexOTP: 1000 };
 const WI_TITLE_REG = 310; // title $214.50 + registration $85 + lien $10
 const WI_DEALER_DOC = 190;
 const WI_DEALER_PREP = 200;
@@ -1122,7 +1122,7 @@ function updateDeal() {
         <div class="deal-row"><span class="dlabel">Military Rebate</span><span class="dval">$500 (Toyota Financial)</span></div>
         <div class="deal-row"><span class="dlabel">4Runner Market</span><span class="dval">High demand — some markups</span></div>
         <div class="deal-row"><span class="dlabel">Best Leverage</span><span class="dval">End of month, multiple quotes</span></div>
-        <div class="nego-tip"><strong>Strategy:</strong> The 4Runner Limited has better dealer margin than TRD Pro. Get quotes from 3+ dealers. The TRD Pro is harder to negotiate (limited allocation). Don't pay any "market adjustment" — walk away and try another dealer. The $500 military rebate requires Toyota Financial Services financing but you can refinance through your credit union 60-90 days later.</div>
+        <div class="nego-tip"><strong>Strategy:</strong> The TRD Off-Road Premium has decent dealer margin (~$5K). The TRD Pro is harder to negotiate (limited allocation). Get quotes from 3+ dealers — Koons Annapolis already has the ORP on the lot. Don't pay any "market adjustment" — walk away and try another dealer. The $500 military rebate requires Toyota Financial Services financing but you can refinance through your credit union 60-90 days later.</div>
       </div>
       <div class="deal-card" style="border-left-color:var(--lexus-gold)">
         <h5 style="color:#b8860b">Lexus Negotiation Tips</h5>
@@ -1155,15 +1155,15 @@ function updateDeal() {
 // EDITABLE COST FIELDS
 // ============================
 const COST_FIELDS = [
-  { key: 'oilChangeCost', label: 'Oil Change Cost', prefix: '$', conf: { bmw:'med', toyLtd:'med', toyTRD:'med', lexPrem:'med', lexOT:'med', lexOTP:'med' } },
-  { key: 'oilChangeInterval', label: 'Oil Change Interval (mi)', prefix: '', conf: { bmw:'high', toyLtd:'high', toyTRD:'high', lexPrem:'high', lexOT:'high', lexOTP:'high' } },
-  { key: 'tireCostSet', label: 'Tire Set Cost (4)', prefix: '$', conf: { bmw:'med', toyLtd:'med', toyTRD:'med', lexPrem:'med', lexOT:'med', lexOTP:'med' } },
-  { key: 'tireLifeMiles', label: 'Tire Life (mi)', prefix: '', conf: { bmw:'med', toyLtd:'med', toyTRD:'med', lexPrem:'med', lexOT:'med', lexOTP:'med' } },
-  { key: 'brakeCost', label: 'Brake Job (all 4)', prefix: '$', conf: { bmw:'med', toyLtd:'med', toyTRD:'med', lexPrem:'low', lexOT:'low', lexOTP:'low' } },
-  { key: 'brakeLifeMiles', label: 'Brake Life (mi)', prefix: '', conf: { bmw:'med', toyLtd:'med', toyTRD:'med', lexPrem:'med', lexOT:'med', lexOTP:'med' } },
-  { key: 'transServiceCost', label: 'Trans Service Cost', prefix: '$', conf: { bmw:'low', toyLtd:'med', toyTRD:'med', lexPrem:'low', lexOT:'low', lexOTP:'low' } },
-  { key: 'transServiceMiles', label: 'Trans Service Interval (mi)', prefix: '', conf: { bmw:'low', toyLtd:'high', toyTRD:'high', lexPrem:'med', lexOT:'med', lexOTP:'med' } },
-  { key: 'annualInsurance', label: 'Annual Insurance', prefix: '$', conf: { bmw:'low', toyLtd:'med', toyTRD:'med', lexPrem:'low', lexOT:'low', lexOTP:'low' } },
+  { key: 'oilChangeCost', label: 'Oil Change Cost', prefix: '$', conf: { bmw:'med', toyORP:'med', toyTRD:'med', lexPrem:'med', lexOT:'med', lexOTP:'med' } },
+  { key: 'oilChangeInterval', label: 'Oil Change Interval (mi)', prefix: '', conf: { bmw:'high', toyORP:'high', toyTRD:'high', lexPrem:'high', lexOT:'high', lexOTP:'high' } },
+  { key: 'tireCostSet', label: 'Tire Set Cost (4)', prefix: '$', conf: { bmw:'med', toyORP:'med', toyTRD:'med', lexPrem:'med', lexOT:'med', lexOTP:'med' } },
+  { key: 'tireLifeMiles', label: 'Tire Life (mi)', prefix: '', conf: { bmw:'med', toyORP:'med', toyTRD:'med', lexPrem:'med', lexOT:'med', lexOTP:'med' } },
+  { key: 'brakeCost', label: 'Brake Job (all 4)', prefix: '$', conf: { bmw:'med', toyORP:'med', toyTRD:'med', lexPrem:'low', lexOT:'low', lexOTP:'low' } },
+  { key: 'brakeLifeMiles', label: 'Brake Life (mi)', prefix: '', conf: { bmw:'med', toyORP:'med', toyTRD:'med', lexPrem:'med', lexOT:'med', lexOTP:'med' } },
+  { key: 'transServiceCost', label: 'Trans Service Cost', prefix: '$', conf: { bmw:'low', toyORP:'med', toyTRD:'med', lexPrem:'low', lexOT:'low', lexOTP:'low' } },
+  { key: 'transServiceMiles', label: 'Trans Service Interval (mi)', prefix: '', conf: { bmw:'low', toyORP:'high', toyTRD:'high', lexPrem:'med', lexOT:'med', lexOTP:'med' } },
+  { key: 'annualInsurance', label: 'Annual Insurance', prefix: '$', conf: { bmw:'low', toyORP:'med', toyTRD:'med', lexPrem:'low', lexOT:'low', lexOTP:'low' } },
 ];
 
 function buildCostEditor() {
