@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>10-Year Cost of Ownership: BMW X3 M50 vs Toyota 4Runner vs Lexus GX 550</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --bmw-blue: #1c69d3;
+  --toy-ltd: #cc0000;
+  --toy-trd: #e63946;
+  --lex-prem: #b8860b;
+  --lex-ot: #8B6914;
+  --lex-otp: #6B4F12;
+  --bg-dark: #0f1117;
+  --bg-card: #1a1d27;
+  --bg-card-hover: #222636;
+  --text-primary: #e8eaf0;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+  --border: #2d3040;
+  --green: #22c55e;
+  --red: #ef4444;
+  --yellow: #f59e0b;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+.container { max-width: 1500px; margin: 0 auto; padding: 20px; }
+.header { text-align: center; padding: 40px 20px 30px; border-bottom: 1px solid var(--border); margin-bottom: 30px; }
+.header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; }
+.header .subtitle { color: var(--text-secondary); font-size: 1rem; }
+.header .scenario { display: inline-block; margin-top: 12px; padding: 6px 16px; background: rgba(28,105,211,0.15); border: 1px solid rgba(28,105,211,0.3); border-radius: 20px; font-size: 0.85rem; color: #7db4f5; }
+
+.assumptions-bar { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; margin-bottom: 30px; display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-end; }
+.assumption-group { display: flex; flex-direction: column; gap: 4px; }
+.assumption-group label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.assumption-group input, .assumption-group select { background: var(--bg-dark); border: 1px solid var(--border); color: var(--text-primary); padding: 8px 12px; border-radius: 8px; font-size: 0.9rem; width: 140px; }
+.assumption-group input:focus { outline: none; border-color: var(--bmw-blue); }
+.btn-recalc { background: var(--bmw-blue); color: #fff; border: none; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600; transition: 0.2s; }
+.btn-recalc:hover { background: #1558b5; }
+
+.tabs { display: flex; gap: 4px; margin-bottom: 24px; background: var(--bg-card); border-radius: 12px; padding: 4px; border: 1px solid var(--border); overflow-x: auto; }
+.tab-btn { flex: 1; padding: 12px 16px; background: transparent; border: none; color: var(--text-muted); font-size: 0.85rem; font-weight: 500; cursor: pointer; border-radius: 8px; transition: 0.2s; white-space: nowrap; }
+.tab-btn.active { background: var(--bmw-blue); color: #fff; }
+.tab-btn:hover:not(.active) { color: var(--text-primary); background: var(--bg-card-hover); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.cards-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+.vehicle-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; position: relative; overflow: hidden; }
+.vehicle-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+.card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+.card-header h3 { font-size: 1rem; font-weight: 600; }
+.card-header .trim { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+.badge { font-size: 0.65rem; padding: 3px 8px; border-radius: 20px; font-weight: 600; text-transform: uppercase; }
+
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.stat { padding: 8px; background: var(--bg-dark); border-radius: 8px; }
+.stat-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.3px; }
+.stat-value { font-size: 1.1rem; font-weight: 700; margin-top: 2px; }
+.stat-sub { font-size: 0.7rem; color: var(--text-secondary); }
+
+.summary-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+.summary-row.six { grid-template-columns: repeat(6, 1fr); }
+.summary-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; }
+.summary-card .big-num { font-size: 1.5rem; font-weight: 800; }
+.summary-card .big-label { font-size: 0.7rem; color: var(--text-muted); margin-top: 4px; }
+.summary-card .big-sub { font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px; }
+
+.chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+.chart-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+.chart-box.full { grid-column: 1 / -1; }
+.chart-box h4 { font-size: 0.95rem; margin-bottom: 16px; color: var(--text-primary); }
+.chart-wrapper { position: relative; height: 350px; }
+.chart-wrapper.tall { height: 420px; }
+
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+.data-table th { text-align: left; padding: 8px 10px; background: var(--bg-dark); color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.68rem; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); }
+.data-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+.data-table tr:hover td { background: var(--bg-card-hover); }
+.data-table .val-best { color: var(--green); font-weight: 600; }
+.data-table .val-worst { color: var(--red); font-weight: 600; }
+.data-table .val-mid { color: var(--yellow); font-weight: 600; }
+
+.verdict-box { background: linear-gradient(135deg, rgba(204,0,0,0.1), rgba(34,197,94,0.05)); border: 1px solid rgba(204,0,0,0.3); border-radius: 12px; padding: 30px; margin-top: 24px; }
+.verdict-box h3 { font-size: 1.2rem; margin-bottom: 12px; }
+.verdict-box p { color: var(--text-secondary); font-size: 0.95rem; margin-top: 10px; }
+.verdict-box .savings { font-size: 1.5rem; font-weight: 800; color: var(--green); margin: 12px 0; }
+
+.dog-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-top: 20px; }
+.dog-section h4 { margin-bottom: 12px; }
+.dog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.dog-item { background: var(--bg-dark); border-radius: 8px; padding: 14px; }
+.dog-item h5 { font-size: 0.82rem; margin-bottom: 6px; }
+.dog-item p { font-size: 0.78rem; color: var(--text-secondary); }
+
+.reliability-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; }
+.rel-card { background: var(--bg-dark); border-radius: 8px; padding: 14px; }
+.rel-card h5 { font-size: 0.82rem; margin-bottom: 8px; }
+.rel-card .score { font-size: 1.8rem; font-weight: 800; }
+.rel-card .issues { margin-top: 8px; }
+.rel-card .issue-item { font-size: 0.72rem; color: var(--text-secondary); padding: 3px 0; border-bottom: 1px solid var(--border); }
+.rel-card .issue-item:last-child { border: none; }
+
+.warning-banner { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; font-size: 0.85rem; color: #fca5a5; }
+
+/* Deal Calculator */
+.deal-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+.deal-section h4 { margin-bottom: 16px; font-size: 1rem; }
+.deal-inputs { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.deal-input { background: var(--bg-dark); border-radius: 8px; padding: 14px; }
+.deal-input label { display: block; font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.deal-input .val-display { font-size: 1.3rem; font-weight: 700; color: var(--green); margin-bottom: 6px; }
+.deal-input .val-display.neg { color: var(--red); }
+.deal-input input[type="range"] { width: 100%; accent-color: var(--bmw-blue); cursor: pointer; }
+.deal-input .range-labels { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
+.deal-input select { width: 100%; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-primary); padding: 6px 10px; border-radius: 6px; font-size: 0.85rem; }
+.deal-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-top: 20px; }
+.deal-card { background: var(--bg-dark); border-radius: 10px; padding: 18px; border-left: 3px solid var(--text-muted); }
+.deal-card h5 { font-size: 0.9rem; margin-bottom: 12px; }
+.deal-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 0.8rem; border-bottom: 1px solid var(--border); }
+.deal-row:last-child { border: none; }
+.deal-row .dlabel { color: var(--text-muted); }
+.deal-row .dval { color: var(--text-secondary); font-weight: 500; }
+.deal-row.total { border-top: 2px solid var(--border); padding-top: 8px; margin-top: 4px; }
+.deal-row.total .dlabel, .deal-row.total .dval { font-weight: 700; font-size: 0.9rem; color: var(--text-primary); }
+.deal-row.highlight .dval { color: var(--green); font-weight: 700; }
+.deal-row.warning .dval { color: var(--red); }
+.finance-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
+.fin-card { background: var(--bg-dark); border-radius: 8px; padding: 14px; text-align: center; }
+.fin-card .term { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
+.fin-card .monthly { font-size: 1.4rem; font-weight: 800; margin: 4px 0; }
+.fin-card .total-int { font-size: 0.72rem; color: var(--text-secondary); }
+.nego-tip { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); border-radius: 8px; padding: 12px; margin-top: 8px; font-size: 0.78rem; color: #86efac; }
+.nego-tip strong { color: var(--green); }
+
+@media (max-width: 1100px) { .cards-row { grid-template-columns: repeat(2, 1fr); } .summary-row.six { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 700px) { .cards-row, .summary-row, .chart-row, .dog-grid, .reliability-grid { grid-template-columns: 1fr; } .summary-row.six { grid-template-columns: repeat(2, 1fr); } .assumptions-bar { flex-direction: column; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>10-Year Cost of Ownership Showdown</h1>
+  <div class="subtitle">6 Vehicles · BMW X3 M50 vs Toyota 4Runner vs Lexus GX 550</div>
+  <div class="scenario">Annapolis, MD · ~17,000 mi/year · Dog-friendly 10-year vehicle · Data as of Feb 2026</div>
+</div>
+
+<div class="assumptions-bar">
+  <div class="assumption-group"><label>Annual Miles</label><input type="number" id="annualMiles" value="17000" step="1000" min="5000" max="30000"></div>
+  <div class="assumption-group"><label>Premium Gas ($/gal)</label><input type="number" id="premiumGas" value="4.29" step="0.10" min="2.00" max="8.00"></div>
+  <div class="assumption-group"><label>Regular Gas ($/gal)</label><input type="number" id="regularGas" value="3.05" step="0.10" min="2.00" max="8.00"></div>
+  <div class="assumption-group"><label>Ownership Years</label><input type="number" id="years" value="10" step="1" min="3" max="15"></div>
+  <div class="assumption-group"><label>Insurance Discount %</label><input type="number" id="insuranceDiscount" value="0" step="5" min="0" max="50"></div>
+  <button class="btn-recalc" onclick="recalculate()">Recalculate</button>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('overview',this)">Overview</button>
+  <button class="tab-btn" onclick="showTab('fuel',this)">Fuel Costs</button>
+  <button class="tab-btn" onclick="showTab('maintenance',this)">Maintenance</button>
+  <button class="tab-btn" onclick="showTab('depreciation',this)">Depreciation</button>
+  <button class="tab-btn" onclick="showTab('insurance',this)">Insurance</button>
+  <button class="tab-btn" onclick="showTab('reliability',this)">Reliability</button>
+  <button class="tab-btn" onclick="showTab('doglife',this)">Dog Life</button>
+  <button class="tab-btn" onclick="showTab('deal',this)">Deal Calculator</button>
+  <button class="tab-btn" onclick="showTab('verdict',this)">Final Verdict</button>
+</div>
+
+<div id="tab-overview" class="tab-content active">
+  <div class="summary-row six" id="netCostSummary"></div>
+  <div class="cards-row" id="vehicleCards"></div>
+  <div class="chart-row"><div class="chart-box full"><h4>Total 10-Year Cost Breakdown (MSRP + Fuel + Maintenance + Insurance − Residual)</h4><div class="chart-wrapper tall"><canvas id="chartStackedBar"></canvas></div></div></div>
+  <div class="chart-row">
+    <div class="chart-box"><h4>Net Cost of Ownership (After Resale)</h4><div class="chart-wrapper"><canvas id="chartNetCost"></canvas></div></div>
+    <div class="chart-box"><h4>Cost Per Mile</h4><div class="chart-wrapper"><canvas id="chartCostPerMile"></canvas></div></div>
+  </div>
+</div>
+
+<div id="tab-fuel" class="tab-content">
+  <div class="summary-row six" id="fuelSummary"></div>
+  <div class="chart-row">
+    <div class="chart-box"><h4>Cumulative Fuel Cost Over Time</h4><div class="chart-wrapper tall"><canvas id="chartFuelCumulative"></canvas></div></div>
+    <div class="chart-box"><h4>Annual Fuel Cost Comparison</h4><div class="chart-wrapper tall"><canvas id="chartFuelAnnual"></canvas></div></div>
+  </div>
+  <div class="chart-box" style="margin-bottom:24px"><h4>Fuel Specifications</h4><table class="data-table" id="fuelTable"></table></div>
+</div>
+
+<div id="tab-maintenance" class="tab-content">
+  <div class="summary-row six" id="maintSummary"></div>
+  <div class="chart-row"><div class="chart-box full"><h4>Maintenance Cost Breakdown by Category</h4><div class="chart-wrapper tall"><canvas id="chartMaintBreakdown"></canvas></div></div></div>
+  <div class="chart-box" style="margin-bottom:24px"><h4>Maintenance Schedule & Costs</h4><table class="data-table" id="maintTable"></table></div>
+  <div class="chart-box"><h4>Tire Cost Comparison</h4><table class="data-table" id="tireTable"></table></div>
+</div>
+
+<div id="tab-depreciation" class="tab-content">
+  <div class="summary-row six" id="depSummary"></div>
+  <div class="chart-row"><div class="chart-box full"><h4>Projected Vehicle Value Over Time</h4><div class="chart-wrapper tall"><canvas id="chartDepreciation"></canvas></div></div></div>
+  <div class="chart-box"><h4>Depreciation Details</h4><table class="data-table" id="depTable"></table></div>
+</div>
+
+<div id="tab-insurance" class="tab-content">
+  <div class="summary-row six" id="insSummary"></div>
+  <div class="chart-row">
+    <div class="chart-box"><h4>Cumulative Insurance Cost</h4><div class="chart-wrapper tall"><canvas id="chartInsurance"></canvas></div></div>
+    <div class="chart-box"><h4>Annual Insurance Premiums</h4><div class="chart-wrapper tall"><canvas id="chartInsAnnual"></canvas></div></div>
+  </div>
+</div>
+
+<div id="tab-reliability" class="tab-content">
+  <div class="warning-banner">⚠️ The 2024–2025 Lexus GX 550 has an active engine recall (machining debris / bearing failure) affecting 127,000+ vehicles. Verify recall status before any GX purchase.</div>
+  <div class="reliability-grid" id="reliabilityGrid"></div>
+  <div class="chart-box" style="margin-top:24px"><h4>Warranty Coverage Comparison</h4><table class="data-table" id="warrantyTable"></table></div>
+</div>
+
+<div id="tab-doglife" class="tab-content">
+  <div class="dog-section"><h4>Dog-Friendly Vehicle Assessment</h4><p style="color:var(--text-secondary);margin-bottom:16px;">Evaluating each vehicle for life with your four-legged co-pilot over 10+ years.</p><div class="dog-grid" id="dogGrid"></div></div>
+</div>
+
+<!-- ======================== DEAL CALCULATOR TAB ======================== -->
+<div id="tab-deal" class="tab-content">
+
+  <div class="deal-section">
+    <h4>Your Trade-In & Loan Position</h4>
+    <div class="deal-inputs">
+      <div class="deal-input">
+        <label>BMW Trade-In Value (KBB est: ~$57,729)</label>
+        <div class="val-display" id="tradeValDisplay">$57,729</div>
+        <input type="range" id="tradeInValue" min="45000" max="62000" value="57729" step="250" oninput="updateDeal()">
+        <div class="range-labels"><span>$45,000</span><span>$62,000</span></div>
+      </div>
+      <div class="deal-input">
+        <label>Remaining Loan Balance on BMW</label>
+        <div class="val-display" id="loanBalDisplay">$30,000</div>
+        <input type="range" id="loanBalance" min="0" max="50000" value="30000" step="500" oninput="updateDeal()">
+        <div class="range-labels"><span>$0 (paid off)</span><span>$50,000</span></div>
+      </div>
+      <div class="deal-input">
+        <label>Your Trade Equity</label>
+        <div class="val-display" id="equityDisplay">$27,729</div>
+        <div style="font-size:0.75rem;color:var(--text-muted);margin-top:8px">Trade-in value minus loan payoff. This is your "down payment" from the BMW.</div>
+      </div>
+      <div class="deal-input">
+        <label>Dealer Negotiation (% off MSRP)</label>
+        <div class="val-display" id="negoDisplay">3%</div>
+        <input type="range" id="negoDiscount" min="0" max="12" value="3" step="0.5" oninput="updateDeal()">
+        <div class="range-labels"><span>0% (MSRP)</span><span>12% off</span></div>
+      </div>
+      <div class="deal-input">
+        <label>WI Sales Tax Rate</label>
+        <select id="wiTaxRate" onchange="updateDeal()">
+          <option value="0.055" selected>5.5% (most WI counties)</option>
+          <option value="0.059">5.9% (Milwaukee County)</option>
+          <option value="0.079">7.9% (Milwaukee City)</option>
+          <option value="0.05">5.0% (no county tax)</option>
+        </select>
+        <div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px">WI gives trade-in tax credit — tax is on (price − trade-in) only</div>
+      </div>
+      <div class="deal-input">
+        <label>Loan APR %</label>
+        <div class="val-display" id="aprDisplay">3.89%</div>
+        <input type="range" id="loanAPR" min="0" max="9" value="3.89" step="0.1" oninput="updateDeal()">
+        <div class="range-labels"><span>0% (promo)</span><span>9%</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="deal-section">
+    <h4>Walk-In Deal Sheet — What You Need at the Table</h4>
+    <div class="deal-cards" id="dealCards"></div>
+  </div>
+
+  <div class="deal-section">
+    <h4>Monthly Payment Comparison (Amount Financed After Equity)</h4>
+    <div id="financeGrid"></div>
+  </div>
+
+  <div class="deal-section">
+    <h4>Negotiation Intel</h4>
+    <div id="negoIntel"></div>
+  </div>
+
+</div>
+
+<div id="tab-verdict" class="tab-content"><div id="verdictContent"></div></div>
+
+</div>
+
+<script>
+const V = {
+  bmw: {
+    name: "BMW X3 M50", trim: "M50 xDrive", year: 2025, modelYearNote: "Current vehicle",
+    msrp: 65625, color: "#1c69d3", badgeText: "Current", badgeClass: "curr",
+    fuelType: "premium", mpgCity: 25, mpgHwy: 30, mpgCombined: 27,
+    engine: "3.0L Twin-Turbo I6", hp: 393, torque: 428, zeroToSixty: 4.4,
+    transmission: "8-spd auto", drivetrain: "xDrive AWD",
+    oilChangeInterval: 10000, oilChangeCost: 175,
+    tireCostSet: 1550, tireLifeMiles: 35000,
+    brakeCost: 1100, brakeLifeMiles: 50000,
+    transServiceCost: 600, transServiceMiles: 90000,
+    majorServiceCosts: [0,0,0,800,0,1200,0,800,0,1500],
+    annualInsurance: 2990,
+    depRate5yr: 0.539, depRate10yr: 0.776,
+    warrantyBasic: "4yr/50k", warrantyPT: "4yr/50k", warrantyFree: "3yr/36k",
+    reliabilityScore: 2.5, repairProb5yr: 0.56, repairsPerYear: 0.8, avgRepairCost: 1034,
+    knownIssues: ["iDrive 9 latency & screen glitches","Steering software recall","Rear brake hose leak recall","56% chance major repair in 5yr","Premium parts = premium labor"],
+    dogCargo: "26.6 cu ft (seats up)", dogNotes: "Tight cargo for dogs. Leather cleans easy but scratches. Low ride height good for older dogs.", dogScore: 6
+  },
+  toyLtd: {
+    name: "4Runner Limited", trim: "Limited 4WD", year: 2026, modelYearNote: "Latest MY",
+    msrp: 51020, color: "#cc0000", badgeText: "Best Value", badgeClass: "best",
+    fuelType: "regular", mpgCity: 20, mpgHwy: 24, mpgCombined: 21,
+    engine: "2.4L Turbo I4 i-FORCE", hp: 278, torque: 317, zeroToSixty: 8.0,
+    transmission: "8-spd auto", drivetrain: "4WD",
+    oilChangeInterval: 10000, oilChangeCost: 75,
+    tireCostSet: 780, tireLifeMiles: 40000,
+    brakeCost: 550, brakeLifeMiles: 55000,
+    transServiceCost: 170, transServiceMiles: 120000,
+    majorServiceCosts: [0,0,300,0,0,550,0,0,300,0],
+    annualInsurance: 1800,
+    depRate5yr: 0.30, depRate10yr: 0.56,
+    warrantyBasic: "3yr/36k", warrantyPT: "5yr/60k", warrantyFree: "2yr/25k ToyotaCare",
+    reliabilityScore: 4.0, repairProb5yr: 0.18, repairsPerYear: 0.3, avgRepairCost: 514,
+    knownIssues: ["New turbo engine (1st gen — monitor)","Some transmission shift-hunting","Electrical memory setting glitches","No recalls as of Feb 2026","Consumer Reports: above-avg predicted"],
+    dogCargo: "47.2 cu ft (seats up) / 90.2 folded", dogNotes: "Excellent cargo. Durable interior resists fur. Power rear window — classic 4Runner dog feature. Higher clearance may need ramp for older dogs.", dogScore: 9
+  },
+  toyTRD: {
+    name: "4Runner TRD Pro", trim: "TRD Pro i-FORCE MAX", year: 2026, modelYearNote: "Latest MY",
+    msrp: 69350, color: "#e63946", badgeText: "Off-Road King", badgeClass: "offroad",
+    fuelType: "regular", mpgCity: 23, mpgHwy: 24, mpgCombined: 23,
+    engine: "2.4L Turbo I4 Hybrid (i-FORCE MAX)", hp: 326, torque: 465, zeroToSixty: 7.7,
+    transmission: "8-spd auto", drivetrain: "4WD Full-Time",
+    oilChangeInterval: 10000, oilChangeCost: 85,
+    tireCostSet: 1100, tireLifeMiles: 35000,
+    brakeCost: 600, brakeLifeMiles: 55000,
+    transServiceCost: 200, transServiceMiles: 120000,
+    majorServiceCosts: [0,0,350,0,0,600,0,0,350,0],
+    annualInsurance: 2100,
+    depRate5yr: 0.25, depRate10yr: 0.50,
+    warrantyBasic: "3yr/36k", warrantyPT: "5yr/60k", warrantyFree: "2yr/25k ToyotaCare",
+    reliabilityScore: 4.0, repairProb5yr: 0.18, repairsPerYear: 0.3, avgRepairCost: 514,
+    knownIssues: ["Hybrid system adds complexity","FOX shocks need rebuild ~60-80k mi","Stabilizer Disconnect Mechanism (new tech)","No recalls as of Feb 2026","Strong predicted reliability"],
+    dogCargo: "47.2 cu ft (seats up) / 90.2 folded", dogNotes: "Same great 4Runner cargo. Power rear window. FOX suspension handles trails with gear + dogs. Hybrid torque great for towing dog trailer.", dogScore: 9
+  },
+  lexPrem: {
+    name: "GX 550 Premium+", trim: "Premium+", year: 2026, modelYearNote: "Latest MY",
+    msrp: 68400, color: "#b8860b", badgeText: "Luxury", badgeClass: "lux",
+    fuelType: "premium", mpgCity: 17, mpgHwy: 22, mpgCombined: 19,
+    engine: "3.4L Twin-Turbo V6", hp: 349, torque: 479, zeroToSixty: 5.8,
+    transmission: "10-spd auto", drivetrain: "4WD",
+    oilChangeInterval: 10000, oilChangeCost: 450,
+    tireCostSet: 1200, tireLifeMiles: 40000,
+    brakeCost: 900, brakeLifeMiles: 55000,
+    transServiceCost: 500, transServiceMiles: 60000,
+    majorServiceCosts: [0,0,1900,0,0,1900,0,0,1500,0],
+    annualInsurance: 3250,
+    depRate5yr: 0.45, depRate10yr: 0.65,
+    warrantyBasic: "4yr/50k", warrantyPT: "6yr/70k", warrantyFree: "1st 2 services free",
+    reliabilityScore: 3.0, repairProb5yr: 0.30, repairsPerYear: 0.4, avgRepairCost: 800,
+    knownIssues: ["⚠️ ENGINE RECALL: machining debris","Hood flutter — skin detachment","Transmission jerking at low speed","Brake squeal (service bulletin)","Parts availability delays 20-50%"],
+    dogCargo: "43.3 cu ft (3rd row folded)", dogNotes: "Good cargo. Luxury leather will show claw marks. Higher ride needs ramp. Third-row available but eats dog space.", dogScore: 7
+  },
+  lexOT: {
+    name: "GX 550 Overtrail", trim: "Overtrail (no 3rd row)", year: 2026, modelYearNote: "Latest MY",
+    msrp: 79900, color: "#8B6914", badgeText: "Adventure", badgeClass: "adv",
+    fuelType: "premium", mpgCity: 15, mpgHwy: 21, mpgCombined: 17,
+    engine: "3.4L Twin-Turbo V6", hp: 349, torque: 479, zeroToSixty: 6.5,
+    transmission: "10-spd auto", drivetrain: "4WD + Locking Center Diff",
+    oilChangeInterval: 10000, oilChangeCost: 450,
+    tireCostSet: 1400, tireLifeMiles: 35000,
+    brakeCost: 900, brakeLifeMiles: 55000,
+    transServiceCost: 500, transServiceMiles: 60000,
+    majorServiceCosts: [0,0,1900,0,0,1900,0,0,1500,0],
+    annualInsurance: 3280,
+    depRate5yr: 0.42, depRate10yr: 0.62,
+    warrantyBasic: "4yr/50k", warrantyPT: "6yr/70k", warrantyFree: "1st 2 services free",
+    reliabilityScore: 3.0, repairProb5yr: 0.30, repairsPerYear: 0.4, avgRepairCost: 800,
+    knownIssues: ["⚠️ ENGINE RECALL: machining debris","33-inch AT tires wear faster","Heavier = worse fuel economy","Adaptive dampers add repair cost","Parts availability delays 20-50%"],
+    dogCargo: "90.5 cu ft (no 3rd row — flat load floor)", dogNotes: "Best Lexus for dogs — no 3rd row means massive flat cargo area. 33-inch tires handle trails. High ride needs ramp. Luxury + adventure.", dogScore: 8
+  },
+  lexOTP: {
+    name: "GX 550 Overtrail+", trim: "Overtrail+ (no 3rd row)", year: 2026, modelYearNote: "Latest MY",
+    msrp: 81395, color: "#6B4F12", badgeText: "Apex Luxury", badgeClass: "apex",
+    fuelType: "premium", mpgCity: 15, mpgHwy: 21, mpgCombined: 17,
+    engine: "3.4L Twin-Turbo V6", hp: 349, torque: 479, zeroToSixty: 6.5,
+    transmission: "10-spd auto", drivetrain: "4WD + Locking Diff + 1\" Lift",
+    oilChangeInterval: 10000, oilChangeCost: 450,
+    tireCostSet: 1400, tireLifeMiles: 35000,
+    brakeCost: 900, brakeLifeMiles: 55000,
+    transServiceCost: 500, transServiceMiles: 60000,
+    majorServiceCosts: [0,0,1900,0,0,1900,0,0,1500,0],
+    annualInsurance: 3300,
+    depRate5yr: 0.43, depRate10yr: 0.63,
+    warrantyBasic: "4yr/50k", warrantyPT: "6yr/70k", warrantyFree: "1st 2 services free",
+    reliabilityScore: 3.0, repairProb5yr: 0.30, repairsPerYear: 0.4, avgRepairCost: 800,
+    knownIssues: ["⚠️ ENGINE RECALL: machining debris","1-inch lift adds suspension cost","Same drivetrain issues as Overtrail","Most expensive GX trim to insure","Parts availability delays 20-50%"],
+    dogCargo: "90.5 cu ft (no 3rd row — flat load floor)", dogNotes: "Same massive cargo as Overtrail. 1-inch lift means even higher step-in — definitely needs ramp. Peak luxury + off-road for dog adventures.", dogScore: 8
+  }
+};
+
+const KEYS = Object.keys(V);
+let calc = {};
+
+function recalculate() {
+  const years = parseInt(document.getElementById('years').value);
+  const annualMiles = parseInt(document.getElementById('annualMiles').value);
+  const premiumGas = parseFloat(document.getElementById('premiumGas').value);
+  const regularGas = parseFloat(document.getElementById('regularGas').value);
+  const insDisc = parseInt(document.getElementById('insuranceDiscount').value) / 100;
+  const totalMiles = annualMiles * years;
+
+  calc = {};
+  for (const [k, v] of Object.entries(V)) {
+    const gp = v.fuelType === 'premium' ? premiumGas : regularGas;
+    const gal = totalMiles / v.mpgCombined;
+    const fuel = gal * gp;
+    const aFuel = fuel / years;
+
+    const oilTotal = Math.floor(totalMiles / v.oilChangeInterval);
+    const freeMi = k === 'bmw' ? 36000 : (k.startsWith('toy') ? 25000 : 5000);
+    const freeOil = Math.min(oilTotal, Math.floor(freeMi / v.oilChangeInterval));
+    const oilCost = (oilTotal - freeOil) * v.oilChangeCost;
+
+    const tireSets = Math.max(0, Math.ceil(totalMiles / v.tireLifeMiles) - 1);
+    const tireCost = tireSets * v.tireCostSet;
+    const brakeJobs = Math.max(0, Math.floor(totalMiles / v.brakeLifeMiles));
+    const brakeCost = brakeJobs * v.brakeCost;
+    const transJobs = Math.max(0, Math.floor(totalMiles / v.transServiceMiles));
+    const transCost = transJobs * v.transServiceCost;
+
+    let majorCost = 0;
+    for (let y = 0; y < years && y < v.majorServiceCosts.length; y++) majorCost += v.majorServiceCosts[y];
+
+    const totalMaint = oilCost + tireCost + brakeCost + transCost + majorCost;
+    const ins = v.annualInsurance * (1 - insDisc) * years;
+
+    let depR;
+    if (years <= 5) depR = v.depRate5yr * (years / 5);
+    else depR = v.depRate5yr + (v.depRate10yr - v.depRate5yr) * ((years - 5) / 5);
+    depR = Math.min(depR, 0.95);
+    const residual = v.msrp * (1 - depR);
+
+    const totalCost = v.msrp + fuel + totalMaint + ins;
+    const netCost = totalCost - residual;
+    const cpm = netCost / totalMiles;
+
+    const yFuel = [], yVal = [], yIns = [];
+    for (let y = 1; y <= years; y++) {
+      yFuel.push(aFuel * y);
+      let yd; if (y <= 5) yd = v.depRate5yr * (y/5); else yd = v.depRate5yr + (v.depRate10yr - v.depRate5yr) * ((y-5)/5);
+      yVal.push(v.msrp * (1 - Math.min(yd, 0.95)));
+      yIns.push(v.annualInsurance * (1 - insDisc) * y);
+    }
+
+    calc[k] = { fuel, aFuel, gal, gp, oilCost, paidOil: oilTotal - freeOil, tireCost, tireSets, brakeCost, brakeJobs, transCost, transJobs, majorCost, totalMaint, ins, residual, depR, totalCost, netCost, cpm, yFuel, yVal, yIns, totalMiles, years };
+  }
+  renderAll();
+}
+
+const fmt = n => '$' + Math.round(n).toLocaleString();
+const fmtD = n => '$' + n.toFixed(2);
+const pct = n => (n*100).toFixed(1)+'%';
+
+let charts = {};
+function destroyCharts() { Object.values(charts).forEach(c => c.destroy()); charts = {}; }
+
+const chartOpts = (cb) => ({
+  responsive: true, maintainAspectRatio: false,
+  plugins: { legend: { labels: { color: '#9ca3af', font: { size: 11 } } } },
+  scales: {
+    x: { ticks: { color: '#9ca3af', font: { size: 10 } }, grid: { color: '#2d3040' } },
+    y: { ticks: { color: '#9ca3af', font: { size: 10 }, callback: cb || (v=>fmt(v)) }, grid: { color: '#2d3040' } }
+  }
+});
+
+function renderAll() {
+  destroyCharts();
+  renderOverview(); renderFuel(); renderMaintenance(); renderDepreciation(); renderInsurance(); renderReliability(); renderDogLife(); renderVerdict();
+  if (typeof updateDeal === 'function') updateDeal();
+}
+
+function renderOverview() {
+  const yrs = calc.bmw.years;
+  const sorted = [...KEYS].sort((a,b) => calc[a].netCost - calc[b].netCost);
+  const best = sorted[0];
+
+  document.getElementById('netCostSummary').innerHTML = KEYS.map(k => `
+    <div class="summary-card">
+      <div class="big-num" style="color:${V[k].color}">${fmt(calc[k].netCost)}</div>
+      <div class="big-label">${V[k].name} ${V[k].year}</div>
+      <div class="big-sub">${fmtD(calc[k].cpm)}/mi · ${k===best?'✓ Lowest':'+'+fmt(calc[k].netCost-calc[best].netCost)}</div>
+    </div>`).join('');
+
+  document.getElementById('vehicleCards').innerHTML = KEYS.map(k => {
+    const v = V[k], c = calc[k];
+    return `<div class="vehicle-card" style="border-top:3px solid ${v.color}">
+      <div class="card-header">
+        <div><h3>${v.name}</h3><div class="trim">${v.year} ${v.trim} · ${v.modelYearNote}</div></div>
+        <span class="badge" style="background:${v.color}22;color:${v.color}">${v.badgeText}</span>
+      </div>
+      <div class="stat-grid">
+        <div class="stat"><div class="stat-label">MSRP</div><div class="stat-value">${fmt(v.msrp)}</div></div>
+        <div class="stat"><div class="stat-label">MPG</div><div class="stat-value">${v.mpgCombined}</div><div class="stat-sub">${v.fuelType}</div></div>
+        <div class="stat"><div class="stat-label">${yrs}yr Fuel</div><div class="stat-value">${fmt(c.fuel)}</div></div>
+        <div class="stat"><div class="stat-label">${yrs}yr Maint</div><div class="stat-value">${fmt(c.totalMaint)}</div></div>
+        <div class="stat"><div class="stat-label">Residual</div><div class="stat-value">${fmt(c.residual)}</div><div class="stat-sub">${pct(1-c.depR)} kept</div></div>
+        <div class="stat"><div class="stat-label">${yrs}yr Ins</div><div class="stat-value">${fmt(c.ins)}</div></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const labels = KEYS.map(k => V[k].name);
+  const colors5 = ['#3b82f6','#ef4444','#f59e0b','#8b5cf6','#22c55e'];
+  charts.stacked = new Chart(document.getElementById('chartStackedBar'), {
+    type: 'bar', data: { labels,
+      datasets: ['Purchase','Fuel','Maintenance','Insurance','Less: Residual'].map((l,i) => ({
+        label: l, backgroundColor: colors5[i],
+        data: KEYS.map(k => i===0?V[k].msrp : i===1?calc[k].fuel : i===2?calc[k].totalMaint : i===3?calc[k].ins : -calc[k].residual)
+      }))
+    }, options: { ...chartOpts(), scales: { x: { stacked:true, ticks:{color:'#9ca3af',font:{size:9}}, grid:{color:'#2d3040'} }, y: { stacked:true, ticks:{color:'#9ca3af',callback:v=>fmt(v)}, grid:{color:'#2d3040'} } } }
+  });
+
+  charts.net = new Chart(document.getElementById('chartNetCost'), {
+    type: 'bar', data: { labels, datasets: [{ data: KEYS.map(k=>calc[k].netCost), backgroundColor: KEYS.map(k=>V[k].color) }] },
+    options: { ...chartOpts(), plugins: { legend: { display: false } } }
+  });
+
+  charts.cpm = new Chart(document.getElementById('chartCostPerMile'), {
+    type: 'bar', data: { labels, datasets: [{ data: KEYS.map(k=>calc[k].cpm), backgroundColor: KEYS.map(k=>V[k].color) }] },
+    options: { ...chartOpts(v=>'$'+v.toFixed(2)), plugins: { legend: { display: false } } }
+  });
+}
+
+function renderFuel() {
+  const yrs = calc.bmw.years;
+  document.getElementById('fuelSummary').innerHTML = KEYS.map(k => `
+    <div class="summary-card"><div class="big-num" style="color:${V[k].color}">${fmt(calc[k].fuel)}</div>
+    <div class="big-label">${V[k].name} · ${yrs}yr Fuel</div>
+    <div class="big-sub">${fmt(calc[k].aFuel)}/yr · ${fmtD(calc[k].gp)}/gal ${V[k].fuelType}</div></div>`).join('');
+
+  const yl = Array.from({length:calc.bmw.years},(_,i)=>'Yr '+(i+1));
+  charts.fCum = new Chart(document.getElementById('chartFuelCumulative'), {
+    type: 'line', data: { labels: yl, datasets: KEYS.map(k=>({ label:V[k].name, data:calc[k].yFuel, borderColor:V[k].color, fill:false, tension:0.3, pointRadius:2 })) }, options: chartOpts()
+  });
+  charts.fAnn = new Chart(document.getElementById('chartFuelAnnual'), {
+    type: 'bar', data: { labels:KEYS.map(k=>V[k].name), datasets:[{data:KEYS.map(k=>calc[k].aFuel),backgroundColor:KEYS.map(k=>V[k].color)}] },
+    options: { ...chartOpts(), plugins:{legend:{display:false}} }
+  });
+
+  const hdr = `<thead><tr><th>Spec</th>${KEYS.map(k=>`<th>${V[k].name}</th>`).join('')}</tr></thead>`;
+  const rows = [
+    ['Engine', k=>V[k].engine], ['HP / Torque', k=>V[k].hp+' hp / '+V[k].torque+' lb-ft'], ['0-60', k=>V[k].zeroToSixty+'s'],
+    ['Fuel Type', k=>V[k].fuelType==='premium'?'Premium 91+':'Regular 87'], ['MPG (C/H/Comb)', k=>V[k].mpgCity+'/'+V[k].mpgHwy+'/'+V[k].mpgCombined],
+    ['Price/Gal', k=>fmtD(calc[k].gp)], ['Total Gallons', k=>Math.round(calc[k].gal).toLocaleString()], ['Total Fuel', k=>'<strong>'+fmt(calc[k].fuel)+'</strong>']
+  ];
+  document.getElementById('fuelTable').innerHTML = hdr + '<tbody>' + rows.map(([l,fn])=>`<tr><td>${l}</td>${KEYS.map(k=>`<td>${fn(k)}</td>`).join('')}</tr>`).join('') + '</tbody>';
+}
+
+function renderMaintenance() {
+  const yrs = calc.bmw.years;
+  document.getElementById('maintSummary').innerHTML = KEYS.map(k=>`
+    <div class="summary-card"><div class="big-num" style="color:${V[k].color}">${fmt(calc[k].totalMaint)}</div>
+    <div class="big-label">${V[k].name} · ${yrs}yr Maint</div>
+    <div class="big-sub">${fmt(calc[k].totalMaint/yrs)}/yr avg</div></div>`).join('');
+
+  const cats = ['Oil','Tires','Brakes','Trans','Major Svc'];
+  charts.maint = new Chart(document.getElementById('chartMaintBreakdown'), {
+    type: 'bar', data: { labels: cats, datasets: KEYS.map(k=>({ label:V[k].name, backgroundColor:V[k].color,
+      data:[calc[k].oilCost, calc[k].tireCost, calc[k].brakeCost, calc[k].transCost, calc[k].majorCost] })) }, options: chartOpts()
+  });
+
+  const hdr = `<thead><tr><th>Service</th>${KEYS.map(k=>`<th>${V[k].name}</th>`).join('')}</tr></thead>`;
+  const mRows = [
+    ['Oil Change Cost', k=>fmt(V[k].oilChangeCost)+'/ea'], ['Paid Oil Changes', k=>calc[k].paidOil+' = '+fmt(calc[k].oilCost)],
+    ['Tire Set Cost', k=>fmt(V[k].tireCostSet)], ['Tire Sets', k=>calc[k].tireSets+' = '+fmt(calc[k].tireCost)],
+    ['Brake Job', k=>fmt(V[k].brakeCost)], ['Brake Jobs', k=>calc[k].brakeJobs+' = '+fmt(calc[k].brakeCost)],
+    ['Trans Svc', k=>fmt(V[k].transServiceCost)+' / '+(V[k].transServiceMiles/1000)+'k mi'],
+    ['Trans Cost', k=>fmt(calc[k].transCost)], ['Major Svcs', k=>fmt(calc[k].majorCost)],
+    ['<strong>TOTAL</strong>', k=>'<strong>'+fmt(calc[k].totalMaint)+'</strong>']
+  ];
+  document.getElementById('maintTable').innerHTML = hdr + '<tbody>' + mRows.map(([l,fn])=>`<tr><td>${l}</td>${KEYS.map(k=>`<td>${fn(k)}</td>`).join('')}</tr>`).join('') + '</tbody>';
+  document.getElementById('tireTable').innerHTML = `<thead><tr><th>Detail</th>${KEYS.map(k=>`<th>${V[k].name}</th>`).join('')}</tr></thead><tbody>
+    <tr><td>Cost/Set</td>${KEYS.map(k=>`<td>${fmt(V[k].tireCostSet)}</td>`).join('')}</tr>
+    <tr><td>Tire Life</td>${KEYS.map(k=>`<td>${(V[k].tireLifeMiles/1000)}k mi</td>`).join('')}</tr>
+    <tr><td>Sets (${calc.bmw.years}yr)</td>${KEYS.map(k=>`<td>${calc[k].tireSets}</td>`).join('')}</tr>
+    <tr><td><strong>Total</strong></td>${KEYS.map(k=>`<td><strong>${fmt(calc[k].tireCost)}</strong></td>`).join('')}</tr></tbody>`;
+}
+
+function renderDepreciation() {
+  const yrs = calc.bmw.years;
+  document.getElementById('depSummary').innerHTML = KEYS.map(k=>`
+    <div class="summary-card"><div class="big-num" style="color:${V[k].color}">${fmt(calc[k].residual)}</div>
+    <div class="big-label">${V[k].name} · Yr ${yrs} Value</div>
+    <div class="big-sub">${pct(1-calc[k].depR)} retained</div></div>`).join('');
+
+  const yl = ['New', ...Array.from({length:yrs},(_,i)=>'Yr '+(i+1))];
+  charts.dep = new Chart(document.getElementById('chartDepreciation'), {
+    type: 'line', data: { labels: yl, datasets: KEYS.map(k=>({ label:V[k].name, data:[V[k].msrp,...calc[k].yVal], borderColor:V[k].color, fill:false, tension:0.3, pointRadius:2 })) }, options: chartOpts()
+  });
+
+  document.getElementById('depTable').innerHTML = `<thead><tr><th>Metric</th>${KEYS.map(k=>`<th>${V[k].name}</th>`).join('')}</tr></thead><tbody>
+    <tr><td>MSRP</td>${KEYS.map(k=>`<td>${fmt(V[k].msrp)}</td>`).join('')}</tr>
+    <tr><td>5yr Dep</td>${KEYS.map(k=>`<td>${pct(V[k].depRate5yr)}</td>`).join('')}</tr>
+    <tr><td>10yr Dep</td>${KEYS.map(k=>`<td>${pct(V[k].depRate10yr)}</td>`).join('')}</tr>
+    <tr><td>Value Yr ${yrs}</td>${KEYS.map(k=>`<td>${fmt(calc[k].residual)}</td>`).join('')}</tr>
+    <tr><td><strong>Loss</strong></td>${KEYS.map(k=>`<td><strong>${fmt(V[k].msrp - calc[k].residual)}</strong></td>`).join('')}</tr></tbody>`;
+}
+
+function renderInsurance() {
+  const yrs = calc.bmw.years;
+  document.getElementById('insSummary').innerHTML = KEYS.map(k=>`
+    <div class="summary-card"><div class="big-num" style="color:${V[k].color}">${fmt(calc[k].ins)}</div>
+    <div class="big-label">${V[k].name} · ${yrs}yr Insurance</div>
+    <div class="big-sub">${fmt(V[k].annualInsurance)}/yr</div></div>`).join('');
+
+  const yl = Array.from({length:yrs},(_,i)=>'Yr '+(i+1));
+  charts.iCum = new Chart(document.getElementById('chartInsurance'), {
+    type: 'line', data: { labels: yl, datasets: KEYS.map(k=>({ label:V[k].name, data:calc[k].yIns, borderColor:V[k].color, fill:false, tension:0.3, pointRadius:2 })) }, options: chartOpts()
+  });
+  charts.iAnn = new Chart(document.getElementById('chartInsAnnual'), {
+    type: 'bar', data: { labels:KEYS.map(k=>V[k].name), datasets:[{data:KEYS.map(k=>V[k].annualInsurance*(1-parseInt(document.getElementById('insuranceDiscount').value)/100)),backgroundColor:KEYS.map(k=>V[k].color)}] },
+    options: { ...chartOpts(), plugins:{legend:{display:false}} }
+  });
+}
+
+function renderReliability() {
+  document.getElementById('reliabilityGrid').innerHTML = KEYS.map(k => {
+    const v = V[k];
+    const sc = v.reliabilityScore >= 4 ? 'var(--green)' : v.reliabilityScore >= 3 ? 'var(--yellow)' : 'var(--red)';
+    return `<div class="rel-card"><h5 style="color:${v.color}">${v.name} (${v.year})</h5>
+      <div class="score" style="color:${sc}">${v.reliabilityScore}/5</div>
+      <div style="font-size:0.72rem;color:var(--text-muted);margin-top:4px">${pct(v.repairProb5yr)} major repair (5yr) · ${v.repairsPerYear}/yr · ~${fmt(v.avgRepairCost)}/yr</div>
+      <div class="issues">${v.knownIssues.map(i=>`<div class="issue-item">${i.startsWith('⚠️')?'':'• '}${i}</div>`).join('')}</div></div>`;
+  }).join('');
+
+  document.getElementById('warrantyTable').innerHTML = `<thead><tr><th>Coverage</th>${KEYS.map(k=>`<th>${V[k].name}</th>`).join('')}</tr></thead><tbody>
+    <tr><td>Basic</td>${KEYS.map(k=>`<td>${V[k].warrantyBasic}</td>`).join('')}</tr>
+    <tr><td>Powertrain</td>${KEYS.map(k=>`<td>${V[k].warrantyPT}</td>`).join('')}</tr>
+    <tr><td>Free Maint</td>${KEYS.map(k=>`<td>${V[k].warrantyFree}</td>`).join('')}</tr></tbody>`;
+}
+
+function renderDogLife() {
+  document.getElementById('dogGrid').innerHTML = KEYS.map(k => {
+    const v = V[k]; const paws = '🐾'.repeat(Math.round(v.dogScore/2));
+    return `<div class="dog-item" style="border-left:3px solid ${v.color}"><h5>${v.name} (${v.year})</h5>
+      <div style="font-size:1.1rem;margin:6px 0">${paws} <span style="font-size:0.75rem;color:var(--text-muted)">${v.dogScore}/10</span></div>
+      <p><strong>Cargo:</strong> ${v.dogCargo}</p><p style="margin-top:5px">${v.dogNotes}</p></div>`;
+  }).join('');
+}
+
+function renderVerdict() {
+  const yrs = calc.bmw.years;
+  const sorted = [...KEYS].sort((a,b) => calc[a].netCost - calc[b].netCost);
+  const best = sorted[0], worst = sorted[sorted.length - 1];
+  const savingsVsBmw = calc.bmw.netCost - calc[best].netCost;
+
+  const tableRows = ['MSRP','Fuel','Maintenance','Insurance','Residual','Reliability','Dog Score','Net Cost'].map(cat => {
+    const vals = KEYS.map(k => {
+      if(cat==='MSRP') return V[k].msrp;
+      if(cat==='Fuel') return calc[k].fuel;
+      if(cat==='Maintenance') return calc[k].totalMaint;
+      if(cat==='Insurance') return calc[k].ins;
+      if(cat==='Residual') return calc[k].residual;
+      if(cat==='Reliability') return V[k].reliabilityScore;
+      if(cat==='Dog Score') return V[k].dogScore;
+      if(cat==='Net Cost') return calc[k].netCost;
+    });
+    const isHighBetter = cat==='Residual'||cat==='Reliability'||cat==='Dog Score';
+    const bestV = isHighBetter ? Math.max(...vals) : Math.min(...vals);
+    const worstV = isHighBetter ? Math.min(...vals) : Math.max(...vals);
+    return `<tr><td>${cat==='Net Cost'?'<strong>'+cat+'</strong>':cat}</td>${KEYS.map((k,i)=>{
+      const v = vals[i]; const isBest = v === bestV; const isWorst = v === worstV;
+      const cls = isBest ? 'val-best' : isWorst ? 'val-worst' : '';
+      const display = cat==='Reliability' ? v+'/5' : cat==='Dog Score' ? v+'/10' : fmt(v);
+      return `<td class="${cls}">${cat==='Net Cost'?'<strong>'+display+'</strong>':display}</td>`;
+    }).join('')}</tr>`;
+  });
+
+  document.getElementById('verdictContent').innerHTML = `
+    <div class="verdict-box">
+      <h3>The Verdict: Trade the BMW for the 2026 ${V[best].name}</h3>
+      <div class="savings">${fmt(savingsVsBmw)} saved vs keeping the BMW over ${yrs} years</div>
+      <p>At your 17K miles/year pace in Annapolis, the <strong>${V[best].name}</strong> comes out on top at ${fmtD(calc[best].cpm)}/mile — the lowest net cost of all six vehicles by a significant margin.</p>
+      <p>The <strong>4Runner TRD Pro</strong> is worth a serious look too: its hybrid powertrain gets 23 MPG combined on regular gas, the FOX suspension and stabilizer disconnect make it genuinely trail-ready, and its predicted depreciation (50% at 10yr) is the best of any vehicle here. You pay more upfront but it holds value like a tank.</p>
+      <p>The <strong>Lexus GX 550</strong> trims are beautiful trucks, but every one of them costs more to own than your current BMW — premium fuel at 15-17 MPG combined, $3,250+/yr insurance, $450 oil changes, and that engine recall is a dealbreaker until Lexus fully resolves it. The Overtrail's flat cargo floor is amazing for dogs, but you're paying $48K+ more over 10 years for it vs the 4Runner Limited.</p>
+      <p>For a dog-friendly, reliable, 10-year-plus vehicle that still has some plushness: the <strong>4Runner Limited</strong> is the wallet-smart pick, and the <strong>TRD Pro</strong> is the "treat yourself responsibly" pick.</p>
+    </div>
+    <div class="chart-box" style="margin-top:24px"><h4>Full Comparison Recap</h4>
+      <table class="data-table"><thead><tr><th>Category</th>${KEYS.map(k=>`<th>${V[k].name}</th>`).join('')}</tr></thead>
+      <tbody>${tableRows.join('')}</tbody></table></div>`;
+}
+
+function showTab(id, el) {
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  el.classList.add('active');
+  setTimeout(()=>Object.values(charts).forEach(c=>c.resize()),50);
+}
+
+// ============================
+// DEAL CALCULATOR
+// ============================
+const DEAL_VEHICLES = ['toyLtd','toyTRD','lexPrem','lexOT','lexOTP'];
+const INVOICE_EST = { toyLtd: 46930, toyTRD: 63800, lexPrem: 62200, lexOT: 72600, lexOTP: 73900 };
+const MILITARY_DISC = { toyLtd: 500, toyTRD: 500, lexPrem: 1000, lexOT: 1000, lexOTP: 1000 };
+const WI_TITLE_REG = 310; // title $214.50 + registration $85 + lien $10
+const WI_DEALER_DOC = 190;
+const WI_DEALER_PREP = 200;
+const WI_HYBRID_SURCHARGE = 75; // annual for TRD Pro hybrid
+
+function updateDeal() {
+  const tradeIn = parseInt(document.getElementById('tradeInValue').value);
+  const loanBal = parseInt(document.getElementById('loanBalance').value);
+  const nego = parseFloat(document.getElementById('negoDiscount').value) / 100;
+  const taxRate = parseFloat(document.getElementById('wiTaxRate').value);
+  const apr = parseFloat(document.getElementById('loanAPR').value) / 100;
+  const equity = tradeIn - loanBal;
+
+  document.getElementById('tradeValDisplay').textContent = fmt(tradeIn);
+  document.getElementById('loanBalDisplay').textContent = fmt(loanBal);
+  document.getElementById('equityDisplay').textContent = fmt(equity);
+  document.getElementById('equityDisplay').className = 'val-display' + (equity < 0 ? ' neg' : '');
+  document.getElementById('negoDisplay').textContent = (nego * 100).toFixed(1) + '%';
+  document.getElementById('aprDisplay').textContent = (apr * 100).toFixed(2) + '%';
+
+  // Deal cards
+  let cardsHTML = '';
+  let finHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">';
+
+  DEAL_VEHICLES.forEach(k => {
+    const v = V[k];
+    const negoPrice = Math.round(v.msrp * (1 - nego));
+    const taxableAmount = Math.max(0, negoPrice - tradeIn);
+    const salesTax = Math.round(taxableAmount * taxRate);
+    const totalFees = WI_TITLE_REG + WI_DEALER_DOC + WI_DEALER_PREP + (k === 'toyTRD' ? WI_HYBRID_SURCHARGE : 0);
+    const otdPrice = negoPrice + salesTax + totalFees;
+    const cashNeeded = otdPrice - tradeIn;
+    const amountFinanced = Math.max(0, cashNeeded + loanBal);
+    const militaryDisc = MILITARY_DISC[k];
+    const invoiceEst = INVOICE_EST[k];
+    const markup = negoPrice - invoiceEst;
+    const msrpDiscount = v.msrp - negoPrice;
+
+    cardsHTML += `
+      <div class="deal-card" style="border-left-color:${v.color}">
+        <h5 style="color:${v.color}">${v.name} (${v.year})</h5>
+        <div class="deal-row"><span class="dlabel">MSRP</span><span class="dval">${fmt(v.msrp)}</span></div>
+        <div class="deal-row highlight"><span class="dlabel">Negotiated Price (${(nego*100).toFixed(1)}% off)</span><span class="dval">${fmt(negoPrice)} (−${fmt(msrpDiscount)})</span></div>
+        <div class="deal-row"><span class="dlabel">− Your Trade-In Credit</span><span class="dval">−${fmt(tradeIn)}</span></div>
+        <div class="deal-row"><span class="dlabel">= Taxable Amount (WI)</span><span class="dval">${fmt(taxableAmount)}</span></div>
+        <div class="deal-row"><span class="dlabel">+ WI Sales Tax (${(taxRate*100).toFixed(1)}%)</span><span class="dval">${fmt(salesTax)}</span></div>
+        <div class="deal-row"><span class="dlabel">+ Title/Reg/Lien Fees</span><span class="dval">${fmt(WI_TITLE_REG)}</span></div>
+        <div class="deal-row"><span class="dlabel">+ Dealer Doc Fee</span><span class="dval">${fmt(WI_DEALER_DOC)}</span></div>
+        <div class="deal-row"><span class="dlabel">+ Dealer Prep Fee</span><span class="dval">${fmt(WI_DEALER_PREP)}</span></div>
+        ${k === 'toyTRD' ? '<div class="deal-row"><span class="dlabel">+ WI Hybrid Surcharge (yr 1)</span><span class="dval">$75</span></div>' : ''}
+        <div class="deal-row total"><span class="dlabel">OUT-THE-DOOR PRICE</span><span class="dval">${fmt(otdPrice)}</span></div>
+        <div class="deal-row"><span class="dlabel">− Trade Equity Applied</span><span class="dval ${equity >= 0 ? 'highlight' : 'warning'}">−${fmt(Math.max(0, equity))}</span></div>
+        ${loanBal > 0 ? `<div class="deal-row warning"><span class="dlabel">+ BMW Loan Payoff</span><span class="dval">${fmt(loanBal)}</span></div>` : ''}
+        <div class="deal-row total" style="border-top-color:${v.color}"><span class="dlabel">AMOUNT TO FINANCE</span><span class="dval" style="color:${v.color};font-size:1.1rem">${fmt(amountFinanced)}</span></div>
+        <div class="deal-row highlight"><span class="dlabel">Military Discount Available</span><span class="dval">−${fmt(militaryDisc)}</span></div>
+        <div class="nego-tip"><strong>Invoice est:</strong> ~${fmt(invoiceEst)} · <strong>Dealer margin at your price:</strong> ~${fmt(markup)} · ${markup < 1500 ? 'Tight deal — may need persistence' : markup < 3000 ? 'Fair margin — room to push' : 'Plenty of room to negotiate harder'}</div>
+      </div>`;
+
+    // Finance card
+    const terms = [48, 60, 72];
+    finHTML += `<div class="deal-card" style="border-left-color:${v.color}"><h5 style="color:${v.color}">${v.name}</h5>
+      <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:8px">Financing ${fmt(amountFinanced)} at ${(apr*100).toFixed(2)}% APR</div>
+      <div class="finance-grid">`;
+    terms.forEach(t => {
+      const monthlyRate = apr / 12;
+      let monthly;
+      if (apr === 0) { monthly = amountFinanced / t; }
+      else { monthly = amountFinanced * (monthlyRate * Math.pow(1 + monthlyRate, t)) / (Math.pow(1 + monthlyRate, t) - 1); }
+      const totalPaid = monthly * t;
+      const totalInterest = totalPaid - amountFinanced;
+      finHTML += `<div class="fin-card"><div class="term">${t} months</div>
+        <div class="monthly" style="color:${v.color}">${fmt(Math.round(monthly))}</div>
+        <div class="total-int">Total interest: ${fmt(Math.round(totalInterest))}</div></div>`;
+    });
+    finHTML += '</div></div>';
+  });
+
+  finHTML += '</div>';
+  document.getElementById('dealCards').innerHTML = cardsHTML;
+  document.getElementById('financeGrid').innerHTML = finHTML;
+
+  // Negotiation intel
+  document.getElementById('negoIntel').innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">
+      <div class="deal-card" style="border-left-color:var(--green)">
+        <h5 style="color:var(--green)">Toyota Negotiation Tips</h5>
+        <div class="deal-row"><span class="dlabel">Military Rebate</span><span class="dval">$500 (Toyota Financial)</span></div>
+        <div class="deal-row"><span class="dlabel">4Runner Market</span><span class="dval">High demand — some markups</span></div>
+        <div class="deal-row"><span class="dlabel">Best Leverage</span><span class="dval">End of month, multiple quotes</span></div>
+        <div class="nego-tip"><strong>Strategy:</strong> The 4Runner Limited has better dealer margin than TRD Pro. Get quotes from 3+ dealers. The TRD Pro is harder to negotiate (limited allocation). Don't pay any "market adjustment" — walk away and try another dealer. The $500 military rebate requires Toyota Financial Services financing but you can refinance through your credit union 60-90 days later.</div>
+      </div>
+      <div class="deal-card" style="border-left-color:var(--lexus-gold)">
+        <h5 style="color:#b8860b">Lexus Negotiation Tips</h5>
+        <div class="deal-row"><span class="dlabel">Military Reward</span><span class="dval">$1,000 (Lexus Financial)</span></div>
+        <div class="deal-row"><span class="dlabel">GX 550 Market</span><span class="dval">Better supply now — deals available</span></div>
+        <div class="deal-row"><span class="dlabel">Best Leverage</span><span class="dval">Engine recall concern = negotiation power</span></div>
+        <div class="nego-tip"><strong>Strategy:</strong> The GX 550 has been sitting on lots longer now. Use the engine recall (127K+ vehicles affected) as leverage — ask them to confirm recall completion in writing. The Overtrail/Overtrail+ are niche trims with slower turnover, giving you more leverage. Lexus Military Reward is $1,000 and stackable with dealer discounts. Push for dealer-installed accessories (mats, cargo liner, dog barrier) as part of the deal instead of cash off.</div>
+      </div>
+      <div class="deal-card" style="border-left-color:var(--bmw-blue)">
+        <h5 style="color:var(--bmw-blue)">Maximizing Your BMW Trade-In</h5>
+        <div class="deal-row"><span class="dlabel">KBB Trade-In (good)</span><span class="dval">~$57,729</span></div>
+        <div class="deal-row"><span class="dlabel">Private Party Value</span><span class="dval">~$61,314</span></div>
+        <div class="deal-row"><span class="dlabel">Spread</span><span class="dval">~$3,585 gap</span></div>
+        <div class="nego-tip"><strong>Strategy:</strong> Get a Carvana/Vroom/CarMax instant quote BEFORE going to the dealer — use that as your floor. Dealers will often match or beat online offers to keep the deal in-house. Also get your KBB Instant Cash Offer printed. If the dealer lowballs your trade by more than $2K vs these numbers, consider selling privately (you'll net ~$3,500 more) and bringing cash. WI's trade-in tax credit makes trading at the dealer more valuable though — selling private means you pay full tax on the new vehicle.</div>
+      </div>
+      <div class="deal-card" style="border-left-color:#9ca3af">
+        <h5>WI Fees & Tax Cheat Sheet</h5>
+        <div class="deal-row"><span class="dlabel">State Sales Tax</span><span class="dval">5.0%</span></div>
+        <div class="deal-row"><span class="dlabel">County Tax (most)</span><span class="dval">+0.5%</span></div>
+        <div class="deal-row"><span class="dlabel">Trade-In Tax Credit</span><span class="dval">YES — tax on difference only</span></div>
+        <div class="deal-row"><span class="dlabel">Title + Registration</span><span class="dval">$299.50</span></div>
+        <div class="deal-row"><span class="dlabel">Lien Recording</span><span class="dval">$10</span></div>
+        <div class="deal-row"><span class="dlabel">Hybrid Surcharge</span><span class="dval">$75/yr (TRD Pro only)</span></div>
+        <div class="nego-tip"><strong>Don't pay for:</strong> VIN etching ($0 value), paint protection film (dealer markup 300%+), nitrogen-filled tires (negligible benefit), extended warranty at signing (buy later if you want it — never at the dealer desk), fabric/leather protection, or "market adjustment" fees. These are pure profit for the dealer.</div>
+      </div>
+    </div>`;
+}
+
+recalculate();
+</script>
+</body>
+</html>
