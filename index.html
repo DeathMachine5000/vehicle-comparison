@@ -165,6 +165,62 @@ body {
 .budget-card .bpay { font-size: 1.3rem; font-weight: 800; margin: 4px 0; }
 .budget-card .bstatus { font-size: 0.7rem; font-weight: 600; }
 
+/* Editable costs panel */
+.costs-panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+.costs-panel h4 { margin-bottom: 4px; }
+.costs-panel .subtitle { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 16px; }
+.costs-toggle { background: rgba(28,105,211,0.15); border: 1px solid rgba(28,105,211,0.3); color: #7db4f5; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 0.82rem; font-weight: 500; margin-bottom: 16px; display: inline-block; }
+.costs-toggle:hover { background: rgba(28,105,211,0.25); }
+.costs-grid { display: none; }
+.costs-grid.open { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+.cost-field { background: var(--bg-dark); border-radius: 6px; padding: 10px; }
+.cost-field label { display: block; font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 4px; }
+.cost-field input { width: 100%; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-primary); padding: 6px 8px; border-radius: 4px; font-size: 0.85rem; }
+.cost-field input:focus { outline: none; border-color: var(--bmw-blue); }
+.cost-field .confidence { font-size: 0.6rem; margin-top: 3px; }
+.conf-high { color: var(--green); }
+.conf-med { color: var(--yellow); }
+.conf-low { color: var(--red); }
+.cost-vehicle-label { font-size: 0.82rem; font-weight: 600; margin-bottom: 8px; padding: 6px 10px; border-radius: 6px; grid-column: 1 / -1; }
+
+/* Print & Save */
+.toolbar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+.toolbar-btn { padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 0.82rem; font-weight: 500; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
+.toolbar-btn:hover { background: var(--bg-card-hover); border-color: var(--bmw-blue); }
+.toolbar-btn.primary { background: var(--bmw-blue); border-color: var(--bmw-blue); color: #fff; }
+.toolbar-btn.primary:hover { background: #1558b5; }
+.snapshot-list { margin-top: 12px; }
+.snapshot-item { background: var(--bg-dark); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+.snapshot-item .snap-name { font-size: 0.85rem; font-weight: 500; }
+.snapshot-item .snap-date { font-size: 0.7rem; color: var(--text-muted); }
+.snapshot-item .snap-actions { display: flex; gap: 6px; }
+.snap-btn { background: none; border: 1px solid var(--border); color: var(--text-secondary); padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 0.72rem; }
+.snap-btn:hover { border-color: var(--bmw-blue); color: var(--text-primary); }
+.snap-btn.del { border-color: rgba(239,68,68,0.3); }
+.snap-btn.del:hover { border-color: var(--red); color: var(--red); }
+
+@media print {
+  body { background: #fff !important; color: #000 !important; font-size: 10pt; }
+  .tabs, .assumptions-bar, .toolbar, .costs-toggle, .costs-grid, .btn-recalc { display: none !important; }
+  .tab-content { display: block !important; page-break-inside: avoid; margin-bottom: 20px; }
+  .tab-content:empty { display: none !important; }
+  .vehicle-card, .summary-card, .deal-card, .chart-box, .deal-section, .dog-item, .rel-card, .gf-pick, .ride-card, .fin-card, .budget-card { background: #fff !important; border: 1px solid #ccc !important; color: #000 !important; }
+  .deal-row .dlabel, .deal-row .dval, .stat-label, .stat-value, .big-num, .big-label, .big-sub, .stat-sub, td, th { color: #000 !important; }
+  .chart-wrapper { display: none; }
+  .header .scenario { background: #f0f0f0 !important; color: #333 !important; border-color: #ccc !important; }
+  .data-table th { background: #e0e0e0 !important; color: #000 !important; }
+  .val-display { color: #000 !important; }
+  .deal-input { background: #f8f8f8 !important; }
+  .nego-tip { background: #f0fff0 !important; color: #333 !important; border-color: #ccc !important; }
+  .nego-tip strong { color: #006600 !important; }
+  .warning-banner { background: #fff0f0 !important; color: #cc0000 !important; }
+  .verdict-box { background: #f8fff8 !important; border-color: #ccc !important; }
+  .verdict-box p, .verdict-box h3, .verdict-box .savings { color: #000 !important; }
+  #printHeader { display: block !important; text-align: center; font-size: 12pt; font-weight: bold; margin-bottom: 10px; border-bottom: 2px solid #000; padding-bottom: 8px; }
+  #printTimestamp { display: block !important; text-align: center; font-size: 9pt; color: #666; margin-bottom: 16px; }
+}
+#printHeader, #printTimestamp { display: none; }
+
 @media (max-width: 1100px) { .cards-row { grid-template-columns: repeat(2, 1fr); } .summary-row.six { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 700px) { .cards-row, .summary-row, .chart-row, .dog-grid, .reliability-grid { grid-template-columns: 1fr; } .summary-row.six { grid-template-columns: repeat(2, 1fr); } .assumptions-bar { flex-direction: column; } }
 </style>
@@ -185,6 +241,23 @@ body {
   <div class="assumption-group"><label>Ownership Years</label><input type="number" id="years" value="10" step="1" min="3" max="15"></div>
   <div class="assumption-group"><label>Insurance Discount %</label><input type="number" id="insuranceDiscount" value="0" step="5" min="0" max="50"></div>
   <button class="btn-recalc" onclick="recalculate()">Recalculate</button>
+</div>
+
+<div id="printHeader">Vehicle Cost of Ownership Comparison — Custom Scenario</div>
+<div id="printTimestamp"></div>
+
+<div class="toolbar">
+  <button class="toolbar-btn primary" onclick="printPage()">Print / Save PDF</button>
+  <button class="toolbar-btn" onclick="saveSnapshot()">Save Scenario</button>
+  <button class="toolbar-btn" onclick="toggleSnapshots()">Saved Scenarios</button>
+  <button class="toolbar-btn" onclick="exportCSV()">Export Summary CSV</button>
+</div>
+<div id="snapshotPanel" style="display:none">
+  <div class="costs-panel">
+    <h4>Saved Scenarios</h4>
+    <div class="subtitle">Save different configurations to compare side-by-side. Scenarios are stored in your browser.</div>
+    <div class="snapshot-list" id="snapshotList"></div>
+  </div>
 </div>
 
 <div class="tabs">
@@ -220,6 +293,12 @@ body {
 </div>
 
 <div id="tab-maintenance" class="tab-content">
+  <div class="costs-panel">
+    <h4>Customize Maintenance Costs</h4>
+    <div class="subtitle">Values marked LOW confidence are estimates — update them with your own dealer quotes for best accuracy. Changes recalculate instantly.</div>
+    <div class="costs-toggle" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.nextElementSibling.classList.contains('open')?'Hide Cost Editor':'Edit Maintenance Costs'">Edit Maintenance Costs</div>
+    <div class="costs-grid" id="costsEditor"></div>
+  </div>
   <div class="summary-row six" id="maintSummary"></div>
   <div class="chart-row"><div class="chart-box full"><h4>Maintenance Cost Breakdown by Category</h4><div class="chart-wrapper tall"><canvas id="chartMaintBreakdown"></canvas></div></div></div>
   <div class="chart-box" style="margin-bottom:24px"><h4>Maintenance Schedule & Costs</h4><table class="data-table" id="maintTable"></table></div>
@@ -369,7 +448,7 @@ const V = {
     oilChangeInterval: 10000, oilChangeCost: 175,
     tireCostSet: 1550, tireLifeMiles: 35000,
     brakeCost: 1100, brakeLifeMiles: 50000,
-    transServiceCost: 600, transServiceMiles: 90000,
+    transServiceCost: 600, transServiceMiles: 60000,
     majorServiceCosts: [0,0,0,800,0,1200,0,800,0,1500],
     annualInsurance: 2990,
     depRate5yr: 0.539, depRate10yr: 0.776,
@@ -420,13 +499,13 @@ const V = {
     fuelType: "premium", mpgCity: 17, mpgHwy: 22, mpgCombined: 19,
     engine: "3.4L Twin-Turbo V6", hp: 349, torque: 479, zeroToSixty: 5.8,
     transmission: "10-spd auto", drivetrain: "4WD",
-    oilChangeInterval: 10000, oilChangeCost: 450,
+    oilChangeInterval: 10000, oilChangeCost: 180,
     tireCostSet: 1200, tireLifeMiles: 40000,
-    brakeCost: 900, brakeLifeMiles: 55000,
+    brakeCost: 750, brakeLifeMiles: 55000,
     transServiceCost: 500, transServiceMiles: 60000,
-    majorServiceCosts: [0,0,1900,0,0,1900,0,0,1500,0],
+    majorServiceCosts: [0,0,1200,0,0,1200,0,0,1000,0],
     annualInsurance: 3250,
-    depRate5yr: 0.45, depRate10yr: 0.65,
+    depRate5yr: 0.38, depRate10yr: 0.60,
     warrantyBasic: "4yr/50k", warrantyPT: "6yr/70k", warrantyFree: "1st 2 services free",
     reliabilityScore: 3.0, repairProb5yr: 0.30, repairsPerYear: 0.4, avgRepairCost: 800,
     knownIssues: ["⚠️ ENGINE RECALL: machining debris","Hood flutter — skin detachment","Transmission jerking at low speed","Brake squeal (service bulletin)","Parts availability delays 20-50%"],
@@ -438,13 +517,13 @@ const V = {
     fuelType: "premium", mpgCity: 15, mpgHwy: 21, mpgCombined: 17,
     engine: "3.4L Twin-Turbo V6", hp: 349, torque: 479, zeroToSixty: 6.5,
     transmission: "10-spd auto", drivetrain: "4WD + Locking Center Diff",
-    oilChangeInterval: 10000, oilChangeCost: 450,
+    oilChangeInterval: 10000, oilChangeCost: 180,
     tireCostSet: 1400, tireLifeMiles: 35000,
-    brakeCost: 900, brakeLifeMiles: 55000,
+    brakeCost: 750, brakeLifeMiles: 55000,
     transServiceCost: 500, transServiceMiles: 60000,
-    majorServiceCosts: [0,0,1900,0,0,1900,0,0,1500,0],
+    majorServiceCosts: [0,0,1200,0,0,1200,0,0,1000,0],
     annualInsurance: 3280,
-    depRate5yr: 0.42, depRate10yr: 0.62,
+    depRate5yr: 0.35, depRate10yr: 0.58,
     warrantyBasic: "4yr/50k", warrantyPT: "6yr/70k", warrantyFree: "1st 2 services free",
     reliabilityScore: 3.0, repairProb5yr: 0.30, repairsPerYear: 0.4, avgRepairCost: 800,
     knownIssues: ["⚠️ ENGINE RECALL: machining debris","33-inch AT tires wear faster","Heavier = worse fuel economy","Adaptive dampers add repair cost","Parts availability delays 20-50%"],
@@ -456,13 +535,13 @@ const V = {
     fuelType: "premium", mpgCity: 15, mpgHwy: 21, mpgCombined: 17,
     engine: "3.4L Twin-Turbo V6", hp: 349, torque: 479, zeroToSixty: 6.5,
     transmission: "10-spd auto", drivetrain: "4WD + Locking Diff + 1\" Lift",
-    oilChangeInterval: 10000, oilChangeCost: 450,
+    oilChangeInterval: 10000, oilChangeCost: 180,
     tireCostSet: 1400, tireLifeMiles: 35000,
-    brakeCost: 900, brakeLifeMiles: 55000,
+    brakeCost: 750, brakeLifeMiles: 55000,
     transServiceCost: 500, transServiceMiles: 60000,
-    majorServiceCosts: [0,0,1900,0,0,1900,0,0,1500,0],
+    majorServiceCosts: [0,0,1200,0,0,1200,0,0,1000,0],
     annualInsurance: 3300,
-    depRate5yr: 0.43, depRate10yr: 0.63,
+    depRate5yr: 0.36, depRate10yr: 0.59,
     warrantyBasic: "4yr/50k", warrantyPT: "6yr/70k", warrantyFree: "1st 2 services free",
     reliabilityScore: 3.0, repairProb5yr: 0.30, repairsPerYear: 0.4, avgRepairCost: 800,
     knownIssues: ["⚠️ ENGINE RECALL: machining debris","1-inch lift adds suspension cost","Same drivetrain issues as Overtrail","Most expensive GX trim to insure","Parts availability delays 20-50%"],
@@ -900,7 +979,7 @@ function renderVerdict() {
       <div class="savings">${fmt(savingsVsBmw)} saved vs keeping the BMW over ${yrs} years</div>
       <p>At your 17K miles/year pace in Annapolis, the <strong>${V[best].name}</strong> comes out on top at ${fmtD(calc[best].cpm)}/mile — the lowest net cost of all six vehicles by a significant margin.</p>
       <p>The <strong>4Runner TRD Pro</strong> is worth a serious look too: its hybrid powertrain gets 23 MPG combined on regular gas, the FOX suspension and stabilizer disconnect make it genuinely trail-ready, and its predicted depreciation (50% at 10yr) is the best of any vehicle here. You pay more upfront but it holds value like a tank.</p>
-      <p>The <strong>Lexus GX 550</strong> trims are beautiful trucks, but every one of them costs more to own than your current BMW — premium fuel at 15-17 MPG combined, $3,250+/yr insurance, $450 oil changes, and that engine recall is a dealbreaker until Lexus fully resolves it. The Overtrail's flat cargo floor is amazing for dogs, but you're paying $48K+ more over 10 years for it vs the 4Runner Limited.</p>
+      <p>The <strong>Lexus GX 550</strong> trims are beautiful trucks, but every one of them costs more to own than your current BMW — premium fuel at 15-17 MPG combined, $3,250+/yr insurance, $180 oil changes, and that engine recall is a dealbreaker until Lexus fully resolves it. The Overtrail's flat cargo floor is amazing for dogs, but you're paying $48K+ more over 10 years for it vs the 4Runner Limited.</p>
       <p>For a dog-friendly, reliable, 10-year-plus vehicle that still has some plushness: the <strong>4Runner Limited</strong> is the wallet-smart pick, and the <strong>TRD Pro</strong> is the "treat yourself responsibly" pick.</p>
     </div>
     <div class="chart-box" style="margin-top:24px"><h4>Full Comparison Recap</h4>
@@ -1072,6 +1151,175 @@ function updateDeal() {
     </div>`;
 }
 
+// ============================
+// EDITABLE COST FIELDS
+// ============================
+const COST_FIELDS = [
+  { key: 'oilChangeCost', label: 'Oil Change Cost', prefix: '$', conf: { bmw:'med', toyLtd:'med', toyTRD:'med', lexPrem:'med', lexOT:'med', lexOTP:'med' } },
+  { key: 'oilChangeInterval', label: 'Oil Change Interval (mi)', prefix: '', conf: { bmw:'high', toyLtd:'high', toyTRD:'high', lexPrem:'high', lexOT:'high', lexOTP:'high' } },
+  { key: 'tireCostSet', label: 'Tire Set Cost (4)', prefix: '$', conf: { bmw:'med', toyLtd:'med', toyTRD:'med', lexPrem:'med', lexOT:'med', lexOTP:'med' } },
+  { key: 'tireLifeMiles', label: 'Tire Life (mi)', prefix: '', conf: { bmw:'med', toyLtd:'med', toyTRD:'med', lexPrem:'med', lexOT:'med', lexOTP:'med' } },
+  { key: 'brakeCost', label: 'Brake Job (all 4)', prefix: '$', conf: { bmw:'med', toyLtd:'med', toyTRD:'med', lexPrem:'low', lexOT:'low', lexOTP:'low' } },
+  { key: 'brakeLifeMiles', label: 'Brake Life (mi)', prefix: '', conf: { bmw:'med', toyLtd:'med', toyTRD:'med', lexPrem:'med', lexOT:'med', lexOTP:'med' } },
+  { key: 'transServiceCost', label: 'Trans Service Cost', prefix: '$', conf: { bmw:'low', toyLtd:'med', toyTRD:'med', lexPrem:'low', lexOT:'low', lexOTP:'low' } },
+  { key: 'transServiceMiles', label: 'Trans Service Interval (mi)', prefix: '', conf: { bmw:'low', toyLtd:'high', toyTRD:'high', lexPrem:'med', lexOT:'med', lexOTP:'med' } },
+  { key: 'annualInsurance', label: 'Annual Insurance', prefix: '$', conf: { bmw:'low', toyLtd:'med', toyTRD:'med', lexPrem:'low', lexOT:'low', lexOTP:'low' } },
+];
+
+function buildCostEditor() {
+  let html = '';
+  KEYS.forEach(k => {
+    const v = V[k];
+    html += `<div class="cost-vehicle-label" style="background:${v.color}22;color:${v.color}">${v.name} (${v.year})</div>`;
+    COST_FIELDS.forEach(f => {
+      const cLvl = f.conf[k] || 'med';
+      const cLabel = cLvl === 'high' ? 'HIGH' : cLvl === 'med' ? 'MEDIUM' : 'LOW — verify with dealer';
+      const cClass = cLvl === 'high' ? 'conf-high' : cLvl === 'med' ? 'conf-med' : 'conf-low';
+      html += `<div class="cost-field">
+        <label>${f.label}</label>
+        <input type="number" id="ce_${k}_${f.key}" value="${v[f.key]}" onchange="updateCostField('${k}','${f.key}',this.value)">
+        <div class="confidence ${cClass}">Confidence: ${cLabel}</div>
+      </div>`;
+    });
+  });
+  document.getElementById('costsEditor').innerHTML = html;
+}
+
+function updateCostField(vKey, field, val) {
+  V[vKey][field] = parseFloat(val);
+  recalculate();
+}
+
+// ============================
+// PRINT / SAVE / EXPORT
+// ============================
+function printPage() {
+  document.getElementById('printTimestamp').textContent =
+    'Printed: ' + new Date().toLocaleString() + ' | Annual Miles: ' +
+    document.getElementById('annualMiles').value + ' | Years: ' +
+    document.getElementById('years').value + ' | Premium: $' +
+    document.getElementById('premiumGas').value + ' | Regular: $' +
+    document.getElementById('regularGas').value;
+  window.print();
+}
+
+function getScenarioData() {
+  const data = {
+    timestamp: new Date().toISOString(),
+    inputs: {
+      annualMiles: document.getElementById('annualMiles').value,
+      years: document.getElementById('years').value,
+      premiumGas: document.getElementById('premiumGas').value,
+      regularGas: document.getElementById('regularGas').value,
+      insuranceDiscount: document.getElementById('insuranceDiscount').value,
+    },
+    dealInputs: {
+      tradeInValue: document.getElementById('tradeInValue').value,
+      loanBalance: document.getElementById('loanBalance').value,
+      cashDown: document.getElementById('cashDown').value,
+      monthlyBudget: document.getElementById('monthlyBudget').value,
+      negoDiscount: document.getElementById('negoDiscount').value,
+      wiTaxRate: document.getElementById('wiTaxRate').value,
+      loanAPR: document.getElementById('loanAPR').value,
+    },
+    vehicleOverrides: {},
+    results: {}
+  };
+  KEYS.forEach(k => {
+    data.vehicleOverrides[k] = {};
+    COST_FIELDS.forEach(f => {
+      data.vehicleOverrides[k][f.key] = V[k][f.key];
+    });
+    if (calc[k]) {
+      data.results[k] = { netCost: Math.round(calc[k].netCost), cpm: calc[k].cpm.toFixed(3), fuel: Math.round(calc[k].fuel), maint: Math.round(calc[k].totalMaint), ins: Math.round(calc[k].ins), residual: Math.round(calc[k].residual) };
+    }
+  });
+  return data;
+}
+
+function saveSnapshot() {
+  const name = prompt('Name this scenario (e.g., "Baseline", "After dealer quote", "GF pick"):');
+  if (!name) return;
+  const scenarios = JSON.parse(localStorage.getItem('vehicleScenarios') || '[]');
+  scenarios.push({ name, data: getScenarioData() });
+  localStorage.setItem('vehicleScenarios', JSON.stringify(scenarios));
+  renderSnapshots();
+  document.getElementById('snapshotPanel').style.display = 'block';
+}
+
+function loadSnapshot(idx) {
+  const scenarios = JSON.parse(localStorage.getItem('vehicleScenarios') || '[]');
+  if (!scenarios[idx]) return;
+  const d = scenarios[idx].data;
+  // Restore inputs
+  Object.entries(d.inputs).forEach(([id, val]) => { const el = document.getElementById(id); if(el) el.value = val; });
+  Object.entries(d.dealInputs || {}).forEach(([id, val]) => { const el = document.getElementById(id); if(el) el.value = val; });
+  // Restore vehicle overrides
+  if (d.vehicleOverrides) {
+    Object.entries(d.vehicleOverrides).forEach(([k, fields]) => {
+      Object.entries(fields).forEach(([f, val]) => {
+        V[k][f] = parseFloat(val);
+        const el = document.getElementById(`ce_${k}_${f}`);
+        if (el) el.value = val;
+      });
+    });
+  }
+  recalculate();
+}
+
+function deleteSnapshot(idx) {
+  const scenarios = JSON.parse(localStorage.getItem('vehicleScenarios') || '[]');
+  scenarios.splice(idx, 1);
+  localStorage.setItem('vehicleScenarios', JSON.stringify(scenarios));
+  renderSnapshots();
+}
+
+function renderSnapshots() {
+  const scenarios = JSON.parse(localStorage.getItem('vehicleScenarios') || '[]');
+  if (scenarios.length === 0) {
+    document.getElementById('snapshotList').innerHTML = '<div style="font-size:0.82rem;color:var(--text-muted)">No saved scenarios yet. Click "Save Scenario" to save your current configuration.</div>';
+    return;
+  }
+  document.getElementById('snapshotList').innerHTML = scenarios.map((s, i) => {
+    const d = new Date(s.data.timestamp);
+    const r = s.data.results || {};
+    const best = Object.entries(r).sort((a,b) => a[1].netCost - b[1].netCost)[0];
+    return `<div class="snapshot-item">
+      <div>
+        <div class="snap-name">${s.name}</div>
+        <div class="snap-date">${d.toLocaleDateString()} ${d.toLocaleTimeString()} · ${s.data.inputs.annualMiles} mi/yr · ${s.data.inputs.years} yrs${best ? ` · Best: ${V[best[0]]?.name || best[0]} (${fmt(best[1].netCost)})` : ''}</div>
+      </div>
+      <div class="snap-actions">
+        <button class="snap-btn" onclick="loadSnapshot(${i})">Load</button>
+        <button class="snap-btn del" onclick="deleteSnapshot(${i})">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleSnapshots() {
+  const p = document.getElementById('snapshotPanel');
+  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+  renderSnapshots();
+}
+
+function exportCSV() {
+  const yrs = calc.bmw.years;
+  let csv = 'Vehicle,Year,MSRP,Net Cost (' + yrs + 'yr),Cost/Mile,Fuel,Maintenance,Insurance,Residual Value\n';
+  KEYS.forEach(k => {
+    const v = V[k], c = calc[k];
+    csv += `"${v.name}",${v.year},${v.msrp},${Math.round(c.netCost)},${c.cpm.toFixed(3)},${Math.round(c.fuel)},${Math.round(c.totalMaint)},${Math.round(c.ins)},${Math.round(c.residual)}\n`;
+  });
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'vehicle-comparison-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+}
+
+// Build the cost editor and initialize
+buildCostEditor();
+renderSnapshots();
 recalculate();
 </script>
 </body>
