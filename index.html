@@ -1,3 +1,5 @@
+
+Vehicle cost comparison · HTML
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -141,6 +143,30 @@ body {
 .nego-tip { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); border-radius: 8px; padding: 12px; margin-top: 8px; font-size: 0.78rem; color: #86efac; }
 .nego-tip strong { color: var(--green); }
 
+/* Comfort & Tech */
+.comfort-check { color: var(--green); font-weight: 700; }
+.comfort-x { color: var(--red); opacity: 0.5; }
+.comfort-partial { color: var(--yellow); }
+.comfort-highlight { background: rgba(34,197,94,0.06); }
+.gf-pick { background: var(--bg-dark); border-radius: 10px; padding: 18px; border-left: 3px solid #ec4899; }
+.gf-pick h5 { color: #ec4899; font-size: 0.9rem; margin-bottom: 8px; }
+.gf-pick .crown { font-size: 1.1rem; margin-bottom: 6px; }
+.gf-pick p { font-size: 0.8rem; color: var(--text-secondary); }
+.ride-card { background: var(--bg-dark); border-radius: 10px; padding: 16px; }
+.ride-card h5 { font-size: 0.85rem; margin-bottom: 10px; }
+.ride-meter { height: 8px; background: var(--bg-card); border-radius: 4px; overflow: hidden; margin-bottom: 4px; }
+.ride-meter-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
+.ride-label { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-muted); }
+
+/* Budget snapshot */
+.budget-snap { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.budget-card { background: var(--bg-dark); border-radius: 10px; padding: 14px; text-align: center; border: 2px solid transparent; }
+.budget-card.in-budget { border-color: rgba(34,197,94,0.4); }
+.budget-card.over-budget { border-color: rgba(239,68,68,0.3); opacity: 0.7; }
+.budget-card .bname { font-size: 0.75rem; color: var(--text-muted); }
+.budget-card .bpay { font-size: 1.3rem; font-weight: 800; margin: 4px 0; }
+.budget-card .bstatus { font-size: 0.7rem; font-weight: 600; }
+
 @media (max-width: 1100px) { .cards-row { grid-template-columns: repeat(2, 1fr); } .summary-row.six { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 700px) { .cards-row, .summary-row, .chart-row, .dog-grid, .reliability-grid { grid-template-columns: 1fr; } .summary-row.six { grid-template-columns: repeat(2, 1fr); } .assumptions-bar { flex-direction: column; } }
 </style>
@@ -172,6 +198,7 @@ body {
   <button class="tab-btn" onclick="showTab('reliability',this)">Reliability</button>
   <button class="tab-btn" onclick="showTab('doglife',this)">Dog Life</button>
   <button class="tab-btn" onclick="showTab('deal',this)">Deal Calculator</button>
+  <button class="tab-btn" onclick="showTab('comfort',this)">Comfort & Tech</button>
   <button class="tab-btn" onclick="showTab('verdict',this)">Final Verdict</button>
 </div>
 
@@ -249,6 +276,19 @@ body {
         <div style="font-size:0.75rem;color:var(--text-muted);margin-top:8px">Trade-in value minus loan payoff. This is your "down payment" from the BMW.</div>
       </div>
       <div class="deal-input">
+        <label>Cash Down Payment (out of pocket)</label>
+        <div class="val-display" id="cashDownDisplay">$0</div>
+        <input type="range" id="cashDown" min="0" max="30000" value="0" step="500" oninput="updateDeal()">
+        <div class="range-labels"><span>$0</span><span>$30,000</span></div>
+      </div>
+      <div class="deal-input">
+        <label>Monthly Budget Max</label>
+        <div class="val-display" id="budgetDisplay">$800</div>
+        <input type="range" id="monthlyBudget" min="300" max="1500" value="800" step="25" oninput="updateDeal()">
+        <div class="range-labels"><span>$300</span><span>$1,500</span></div>
+        <div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px">Payments above this will show a warning</div>
+      </div>
+      <div class="deal-input">
         <label>Dealer Negotiation (% off MSRP)</label>
         <div class="val-display" id="negoDisplay">3%</div>
         <input type="range" id="negoDiscount" min="0" max="12" value="3" step="0.5" oninput="updateDeal()">
@@ -274,6 +314,11 @@ body {
   </div>
 
   <div class="deal-section">
+    <h4>Budget Snapshot — 60-Month Payments at a Glance</h4>
+    <div class="budget-snap" id="budgetSnap"></div>
+  </div>
+
+  <div class="deal-section">
     <h4>Walk-In Deal Sheet — What You Need at the Table</h4>
     <div class="deal-cards" id="dealCards"></div>
   </div>
@@ -288,6 +333,27 @@ body {
     <div id="negoIntel"></div>
   </div>
 
+</div>
+
+<!-- ======================== COMFORT & TECH TAB ======================== -->
+<div id="tab-comfort" class="tab-content">
+  <div class="deal-section">
+    <h4>Comfort & Tech Feature Comparison — The Stuff That Makes Daily Driving Great</h4>
+    <p style="color:var(--text-secondary);margin-bottom:16px;font-size:0.85rem">These are the creature comforts and tech features that matter when you're commuting, road-tripping, or just running errands with the dog.</p>
+    <table class="data-table" id="comfortTable"></table>
+  </div>
+  <div class="deal-section">
+    <h4>Ride & Driving Feel — What Your Butt Will Notice</h4>
+    <div id="rideGrid"></div>
+  </div>
+  <div class="deal-section">
+    <h4>Safety Tech — Standard Equipment</h4>
+    <table class="data-table" id="safetyTable"></table>
+  </div>
+  <div class="deal-section">
+    <h4>The GF Seal of Approval — Quick-Pick Feature Highlights</h4>
+    <div id="gfPicks"></div>
+  </div>
 </div>
 
 <div id="tab-verdict" class="tab-content"><div id="verdictContent"></div></div>
@@ -483,7 +549,7 @@ const chartOpts = (cb) => ({
 
 function renderAll() {
   destroyCharts();
-  renderOverview(); renderFuel(); renderMaintenance(); renderDepreciation(); renderInsurance(); renderReliability(); renderDogLife(); renderVerdict();
+  renderOverview(); renderFuel(); renderMaintenance(); renderDepreciation(); renderInsurance(); renderReliability(); renderDogLife(); renderComfort(); renderVerdict();
   if (typeof updateDeal === 'function') updateDeal();
 }
 
@@ -656,6 +722,152 @@ function renderDogLife() {
   }).join('');
 }
 
+function renderComfort() {
+  // Comfort & tech feature matrix
+  const COMFORT = {
+    bmw: {
+      heatedSeats: 'Standard (front+rear)', cooledSeats: 'Standard', heatedWheel: 'Standard',
+      panoroof: '14.9" fixed glass', headsUp: 'Standard', wireless: 'Wireless AA+CP',
+      sound: 'Harman Kardon 16-spkr', screenSize: '14.9" curved wide', remoteStart: 'BMW App',
+      keyless: 'Digital key + fob', memorySeats: '2-person memory', powerLift: 'Hands-free',
+      ambientLight: '10-color ambient', ventilation: 'Standard', massage: 'No', rearUSB: '2x USB-C',
+      adaptCruise: 'Standard w/ stop-go', parkAssist: 'Auto park + 360 cam', blindSpot: 'Standard',
+      laneKeep: 'Standard', rearCross: 'Standard', autoHighBeam: 'Standard',
+      rideQuality: 8, cabinNoise: 9, techScore: 9, luxuryScore: 8
+    },
+    toyLtd: {
+      heatedSeats: 'Standard (front)', cooledSeats: 'Standard (front)', heatedWheel: 'Standard',
+      panoroof: 'Moonroof', headsUp: 'Standard (10")', wireless: 'Wireless AA+CP',
+      sound: 'JBL 14-spkr', screenSize: '14" touchscreen', remoteStart: 'Remote Connect App',
+      keyless: 'Smart Key', memorySeats: '2-person memory', powerLift: 'Power w/ kick sensor',
+      ambientLight: 'Yes', ventilation: 'Front only', massage: 'No', rearUSB: '2x USB-C',
+      adaptCruise: 'Standard w/ stop-go', parkAssist: 'Multi-terrain monitor', blindSpot: 'Standard',
+      laneKeep: 'Standard', rearCross: 'Standard', autoHighBeam: 'Standard',
+      rideQuality: 7, cabinNoise: 7, techScore: 8, luxuryScore: 7
+    },
+    toyTRD: {
+      heatedSeats: 'Standard (front)', cooledSeats: 'No', heatedWheel: 'Standard',
+      panoroof: 'No (rigid roof)', headsUp: 'Standard (10")', wireless: 'Wireless AA+CP',
+      sound: 'JBL 14-spkr', screenSize: '14" touchscreen', remoteStart: 'Remote Connect App',
+      keyless: 'Smart Key', memorySeats: 'Driver memory', powerLift: 'Power w/ kick sensor',
+      ambientLight: 'Limited', ventilation: 'No', massage: 'No', rearUSB: '2x USB-C',
+      adaptCruise: 'Standard w/ stop-go', parkAssist: 'Multi-terrain camera', blindSpot: 'Standard',
+      laneKeep: 'Standard', rearCross: 'Standard', autoHighBeam: 'Standard',
+      rideQuality: 6, cabinNoise: 6, techScore: 7, luxuryScore: 5
+    },
+    lexPrem: {
+      heatedSeats: 'Standard (front+rear)', cooledSeats: 'Standard (front)', heatedWheel: 'Standard',
+      panoroof: 'Panoramic moonroof', headsUp: 'Standard (color)', wireless: 'Wireless AA+CP',
+      sound: 'Mark Levinson 21-spkr', screenSize: '14" touchscreen', remoteStart: 'Lexus App',
+      keyless: 'Digital key + fob', memorySeats: '3-person memory', powerLift: 'Hands-free',
+      ambientLight: '64-color ambient', ventilation: 'Standard', massage: 'No', rearUSB: '2x USB-C + 1x USB-A',
+      adaptCruise: 'Standard w/ stop-go', parkAssist: 'Advanced Park + 360 cam', blindSpot: 'Standard',
+      laneKeep: 'Standard + lane trace', rearCross: 'Standard w/ auto brake', autoHighBeam: 'Standard',
+      rideQuality: 8, cabinNoise: 8, techScore: 9, luxuryScore: 9
+    },
+    lexOT: {
+      heatedSeats: 'Standard (front)', cooledSeats: 'Standard (front)', heatedWheel: 'Standard',
+      panoroof: 'No (off-road reinforced)', headsUp: 'Standard (color)', wireless: 'Wireless AA+CP',
+      sound: 'Mark Levinson 21-spkr', screenSize: '14" touchscreen', remoteStart: 'Lexus App',
+      keyless: 'Digital key + fob', memorySeats: '2-person memory', powerLift: 'Hands-free',
+      ambientLight: '64-color ambient', ventilation: 'Standard', massage: 'No', rearUSB: '2x USB-C',
+      adaptCruise: 'Standard w/ stop-go', parkAssist: 'Advanced Park + 360 cam', blindSpot: 'Standard',
+      laneKeep: 'Standard + lane trace', rearCross: 'Standard w/ auto brake', autoHighBeam: 'Standard',
+      rideQuality: 7, cabinNoise: 7, techScore: 9, luxuryScore: 8
+    },
+    lexOTP: {
+      heatedSeats: 'Standard (front)', cooledSeats: 'Standard (front)', heatedWheel: 'Standard',
+      panoroof: 'No (off-road reinforced)', headsUp: 'Standard (color)', wireless: 'Wireless AA+CP',
+      sound: 'Mark Levinson 21-spkr', screenSize: '14" touchscreen', remoteStart: 'Lexus App',
+      keyless: 'Digital key + fob', memorySeats: '2-person memory', powerLift: 'Hands-free',
+      ambientLight: '64-color ambient', ventilation: 'Standard', massage: 'No', rearUSB: '2x USB-C',
+      adaptCruise: 'Standard w/ stop-go', parkAssist: 'Advanced Park + 360 cam', blindSpot: 'Standard',
+      laneKeep: 'Standard + lane trace', rearCross: 'Standard w/ auto brake', autoHighBeam: 'Standard',
+      rideQuality: 7, cabinNoise: 7, techScore: 9, luxuryScore: 8
+    }
+  };
+
+  const featureRows = [
+    ['Heated Seats', 'heatedSeats'], ['Cooled/Ventilated Seats', 'cooledSeats'], ['Heated Steering Wheel', 'heatedWheel'],
+    ['Panoramic/Moonroof', 'panoroof'], ['Heads-Up Display', 'headsUp'], ['Wireless AA/CarPlay', 'wireless'],
+    ['Sound System', 'sound'], ['Screen Size', 'screenSize'], ['Remote Start', 'remoteStart'],
+    ['Keyless Entry', 'keyless'], ['Memory Seats', 'memorySeats'], ['Power Liftgate', 'powerLift'],
+    ['Ambient Lighting', 'ambientLight'], ['Seat Ventilation', 'ventilation'], ['Massage Seats', 'massage'],
+    ['Rear USB Ports', 'rearUSB']
+  ];
+
+  const check = val => {
+    if (!val || val === 'No' || val === 'No (rigid roof)' || val === 'No (off-road reinforced)') return `<span class="comfort-x">Not available</span>`;
+    if (val.startsWith('Limited') || val.startsWith('Front only') || val.startsWith('Driver')) return `<span class="comfort-partial">${val}</span>`;
+    return `<span class="comfort-check">${val}</span>`;
+  };
+
+  const hdr = `<thead><tr><th>Feature</th>${KEYS.map(k=>`<th style="min-width:120px">${V[k].name}</th>`).join('')}</tr></thead>`;
+  const rows = featureRows.map(([label, key]) =>
+    `<tr><td>${label}</td>${KEYS.map(k => `<td>${check(COMFORT[k][key])}</td>`).join('')}</tr>`
+  ).join('');
+  document.getElementById('comfortTable').innerHTML = hdr + '<tbody>' + rows + '</tbody>';
+
+  // Ride quality grid
+  const rideMetrics = [
+    ['Ride Comfort', 'rideQuality', 'Smoother suspension, fewer bumps felt'],
+    ['Cabin Quiet', 'cabinNoise', 'Less road/wind/engine noise inside'],
+    ['Tech & Infotainment', 'techScore', 'Screen quality, responsiveness, features'],
+    ['Interior Luxury', 'luxuryScore', 'Materials, fit & finish, premium feel']
+  ];
+  document.getElementById('rideGrid').innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:12px">${KEYS.map(k => {
+    const c = COMFORT[k];
+    return `<div class="ride-card" style="border-left:3px solid ${V[k].color}"><h5 style="color:${V[k].color}">${V[k].name} (${V[k].year})</h5>
+      ${rideMetrics.map(([label, key, desc]) => `
+        <div style="margin-bottom:10px">
+          <div class="ride-label"><span>${label}</span><span>${c[key]}/10</span></div>
+          <div class="ride-meter"><div class="ride-meter-fill" style="width:${c[key]*10}%;background:${V[k].color}"></div></div>
+        </div>`).join('')}
+    </div>`;
+  }).join('')}</div>`;
+
+  // Safety table
+  const safetyRows = [
+    ['Adaptive Cruise Control', 'adaptCruise'], ['Parking Assist', 'parkAssist'], ['Blind Spot Monitor', 'blindSpot'],
+    ['Lane Keep Assist', 'laneKeep'], ['Rear Cross Traffic', 'rearCross'], ['Auto High Beams', 'autoHighBeam']
+  ];
+  const sHdr = `<thead><tr><th>Safety Feature</th>${KEYS.map(k=>`<th>${V[k].name}</th>`).join('')}</tr></thead>`;
+  const sRows = safetyRows.map(([label, key]) =>
+    `<tr><td>${label}</td>${KEYS.map(k => `<td>${check(COMFORT[k][key])}</td>`).join('')}</tr>`
+  ).join('');
+  document.getElementById('safetyTable').innerHTML = sHdr + '<tbody>' + sRows + '</tbody>';
+
+  // GF's Seal of Approval picks
+  document.getElementById('gfPicks').innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:12px">
+      <div class="gf-pick">
+        <div class="crown">Best Daily Driver Comfort</div>
+        <h5>Lexus GX 550 Premium+</h5>
+        <p>Mark Levinson 21-speaker audio, 64-color ambient lighting, heated+cooled front seats, heated rear seats, panoramic moonroof, and the quietest cabin short of the BMW. If you want to feel pampered on the Annapolis commute, this is it.</p>
+      </div>
+      <div class="gf-pick">
+        <div class="crown">Best Tech for the Price</div>
+        <h5>4Runner Limited</h5>
+        <p>JBL 14-speaker audio, 14" touchscreen, heads-up display, wireless CarPlay/AA, heated+cooled seats, and a moonroof — all for $51K. You get 85% of the Lexus tech experience at 60% of the price. The best bang-for-buck comfort package here.</p>
+      </div>
+      <div class="gf-pick">
+        <div class="crown">Best for Road Trips</div>
+        <h5>GX 550 Overtrail</h5>
+        <p>That flat cargo floor with no 3rd row is a game-changer for road trips with gear + dog. Mark Levinson audio for long highway stretches, and 64-color ambient lighting for nighttime vibes. It's the adventure-luxury sweet spot.</p>
+      </div>
+      <div class="gf-pick">
+        <div class="crown">Best "Fun" Factor</div>
+        <h5>4Runner TRD Pro</h5>
+        <p>The hybrid gets 23 MPG (best fuel economy here), the FOX suspension is legitimately trail-ready, and it has the iconic power rear window your dog will love. Trade-off: no cooled seats, no moonroof, and a firmer ride on pavement. This is for the adventure couple.</p>
+      </div>
+      <div class="gf-pick">
+        <div class="crown">What You're Giving Up (BMW)</div>
+        <h5>BMW X3 M50</h5>
+        <p>The BMW has the best driving dynamics, the quietest cabin, and genuinely great tech (iDrive is excellent). But at $124K+ in net cost over 10 years with that brutal depreciation and repair probability... the creature comforts come at a steep, steep price.</p>
+      </div>
+    </div>`;
+}
+
 function renderVerdict() {
   const yrs = calc.bmw.years;
   const sorted = [...KEYS].sort((a,b) => calc[a].netCost - calc[b].netCost);
@@ -720,6 +932,8 @@ const WI_HYBRID_SURCHARGE = 75; // annual for TRD Pro hybrid
 function updateDeal() {
   const tradeIn = parseInt(document.getElementById('tradeInValue').value);
   const loanBal = parseInt(document.getElementById('loanBalance').value);
+  const cashDown = parseInt(document.getElementById('cashDown').value);
+  const monthlyBudget = parseInt(document.getElementById('monthlyBudget').value);
   const nego = parseFloat(document.getElementById('negoDiscount').value) / 100;
   const taxRate = parseFloat(document.getElementById('wiTaxRate').value);
   const apr = parseFloat(document.getElementById('loanAPR').value) / 100;
@@ -727,6 +941,8 @@ function updateDeal() {
 
   document.getElementById('tradeValDisplay').textContent = fmt(tradeIn);
   document.getElementById('loanBalDisplay').textContent = fmt(loanBal);
+  document.getElementById('cashDownDisplay').textContent = fmt(cashDown);
+  document.getElementById('budgetDisplay').textContent = fmt(monthlyBudget);
   document.getElementById('equityDisplay').textContent = fmt(equity);
   document.getElementById('equityDisplay').className = 'val-display' + (equity < 0 ? ' neg' : '');
   document.getElementById('negoDisplay').textContent = (nego * 100).toFixed(1) + '%';
@@ -744,7 +960,8 @@ function updateDeal() {
     const totalFees = WI_TITLE_REG + WI_DEALER_DOC + WI_DEALER_PREP + (k === 'toyTRD' ? WI_HYBRID_SURCHARGE : 0);
     const otdPrice = negoPrice + salesTax + totalFees;
     const cashNeeded = otdPrice - tradeIn;
-    const amountFinanced = Math.max(0, cashNeeded + loanBal);
+    const amountFinanced = Math.max(0, cashNeeded + loanBal - cashDown);
+    const totalOutOfPocket = cashDown + (equity < 0 ? Math.abs(equity) : 0);
     const militaryDisc = MILITARY_DISC[k];
     const invoiceEst = INVOICE_EST[k];
     const markup = negoPrice - invoiceEst;
@@ -765,7 +982,9 @@ function updateDeal() {
         <div class="deal-row total"><span class="dlabel">OUT-THE-DOOR PRICE</span><span class="dval">${fmt(otdPrice)}</span></div>
         <div class="deal-row"><span class="dlabel">− Trade Equity Applied</span><span class="dval ${equity >= 0 ? 'highlight' : 'warning'}">−${fmt(Math.max(0, equity))}</span></div>
         ${loanBal > 0 ? `<div class="deal-row warning"><span class="dlabel">+ BMW Loan Payoff</span><span class="dval">${fmt(loanBal)}</span></div>` : ''}
+        ${cashDown > 0 ? `<div class="deal-row highlight"><span class="dlabel">− Cash Down Payment</span><span class="dval">−${fmt(cashDown)}</span></div>` : ''}
         <div class="deal-row total" style="border-top-color:${v.color}"><span class="dlabel">AMOUNT TO FINANCE</span><span class="dval" style="color:${v.color};font-size:1.1rem">${fmt(amountFinanced)}</span></div>
+        ${cashDown > 0 ? `<div class="deal-row"><span class="dlabel">Total Cash at Signing</span><span class="dval" style="font-weight:700">${fmt(totalOutOfPocket)}</span></div>` : ''}
         <div class="deal-row highlight"><span class="dlabel">Military Discount Available</span><span class="dval">−${fmt(militaryDisc)}</span></div>
         <div class="nego-tip"><strong>Invoice est:</strong> ~${fmt(invoiceEst)} · <strong>Dealer margin at your price:</strong> ~${fmt(markup)} · ${markup < 1500 ? 'Tight deal — may need persistence' : markup < 3000 ? 'Fair margin — room to push' : 'Plenty of room to negotiate harder'}</div>
       </div>`;
@@ -782,9 +1001,13 @@ function updateDeal() {
       else { monthly = amountFinanced * (monthlyRate * Math.pow(1 + monthlyRate, t)) / (Math.pow(1 + monthlyRate, t) - 1); }
       const totalPaid = monthly * t;
       const totalInterest = totalPaid - amountFinanced;
-      finHTML += `<div class="fin-card"><div class="term">${t} months</div>
-        <div class="monthly" style="color:${v.color}">${fmt(Math.round(monthly))}</div>
-        <div class="total-int">Total interest: ${fmt(Math.round(totalInterest))}</div></div>`;
+      const overBudget = monthly > monthlyBudget;
+      const nearBudget = monthly > monthlyBudget * 0.9 && !overBudget;
+      const budgetIcon = overBudget ? '<span style="color:var(--red);font-size:0.7rem">OVER BUDGET</span>' : nearBudget ? '<span style="color:var(--yellow);font-size:0.7rem">TIGHT</span>' : '<span style="color:var(--green);font-size:0.7rem">FITS BUDGET</span>';
+      finHTML += `<div class="fin-card" style="${overBudget ? 'border:1px solid rgba(239,68,68,0.4);background:rgba(239,68,68,0.05)' : nearBudget ? 'border:1px solid rgba(245,158,11,0.3)' : 'border:1px solid rgba(34,197,94,0.3);background:rgba(34,197,94,0.05)'}"><div class="term">${t} months</div>
+        <div class="monthly" style="color:${overBudget ? 'var(--red)' : v.color}">${fmt(Math.round(monthly))}</div>
+        <div class="total-int">Total interest: ${fmt(Math.round(totalInterest))}</div>
+        <div style="margin-top:4px">${budgetIcon}</div></div>`;
     });
     finHTML += '</div></div>';
   });
@@ -792,6 +1015,27 @@ function updateDeal() {
   finHTML += '</div>';
   document.getElementById('dealCards').innerHTML = cardsHTML;
   document.getElementById('financeGrid').innerHTML = finHTML;
+
+  // Budget snapshot — quick 60-month view
+  let snapHTML = '';
+  DEAL_VEHICLES.forEach(k => {
+    const v = V[k];
+    const np = Math.round(v.msrp * (1 - nego));
+    const ta = Math.max(0, np - tradeIn);
+    const st = Math.round(ta * taxRate);
+    const tf = WI_TITLE_REG + WI_DEALER_DOC + WI_DEALER_PREP + (k === 'toyTRD' ? WI_HYBRID_SURCHARGE : 0);
+    const otd = np + st + tf;
+    const af = Math.max(0, otd - tradeIn + loanBal - cashDown);
+    const mr = apr / 12;
+    let mo60 = apr === 0 ? af / 60 : af * (mr * Math.pow(1 + mr, 60)) / (Math.pow(1 + mr, 60) - 1);
+    const inBudget = mo60 <= monthlyBudget;
+    snapHTML += `<div class="budget-card ${inBudget ? 'in-budget' : 'over-budget'}">
+      <div class="bname">${v.name}</div>
+      <div class="bpay" style="color:${inBudget ? 'var(--green)' : 'var(--red)'}">${fmt(Math.round(mo60))}/mo</div>
+      <div class="bstatus" style="color:${inBudget ? 'var(--green)' : 'var(--red)'}">${inBudget ? 'FITS BUDGET' : '$' + Math.round(mo60 - monthlyBudget) + '/mo over'}</div>
+    </div>`;
+  });
+  document.getElementById('budgetSnap').innerHTML = snapHTML;
 
   // Negotiation intel
   document.getElementById('negoIntel').innerHTML = `
